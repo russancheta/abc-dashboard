@@ -1,0 +1,90 @@
+<div class="animated fadeIn">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="form-group">
+                <label>Choose Branch</label>
+                <select class="form-control" (change)="onChangeBranch($event.target.value)">
+                    <option *ngFor="let b of branches">
+                        {{ b.name }}
+                    </option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <ngb-tabset>
+        <ngb-tab>
+            <ng-template ngbTabTitle>Report Completion<span class="badge badge-primary"></span></ng-template>
+            <ng-template ngbTabContent>
+                <div class="table-responsive">
+                    <table class="table table-hover table-sm">
+                        <thead>
+                            <tr>
+                                <th class="text-center" width="3%"><i class="fa fa-eye"></i></th>
+                                <th>ITR No.</th>
+                                <!-- <th class="text-center">DR</th> -->
+                                <!-- <th>Customer Code</th> -->
+                                <th>Branch Name</th>
+                                <th>Doc. Date</th>
+                                <th>Status</th>
+                                <th>Days Due</th>
+                                <th>IT No.</th>
+                                <!--<th>Remarks</th>-->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr
+                                *ngFor="let o of reportCompletion | slice: (page-1) * pageSize : (page-1) * pageSize + pageSize">
+                                <td class="text-center">
+                                    <button type="button" class="btn btn-link btn-sm"
+                                        (click)="openModal(grModal, o.docNum)">View</button>
+                                </td>
+                                <td> {{ o.itrNo }} </td>
+                                <td> {{ o.branchName }}</td>
+                                <td> {{ o.docDate | date: 'yyyy-MM-dd' }} </td>
+                                <td> {{ o.status }} </td>
+                                <td> {{ o.daysDue }} </td>
+                                <td> {{ o.invTransferNo }} </td>
+                                <!--<td> {{ o.docRemarks }} </td>-->
+                            </tr>
+                        </tbody>
+                    </table>
+                    <ngb-pagination [(page)]="page" [pageSize]="pageSize" [collectionSize]="reportCompletion.length">
+                    </ngb-pagination>
+                </div>
+            </ng-template>
+        </ngb-tab>
+    </ngb-tabset>
+    <ng-template #grModal let-modal>
+        <div class="modal-header">
+            <h4 class="modal-title" class="modal-basic-title">Report Completion (GR)</h4>
+            <button type="button" class="close" aria-label="close" (click)="closeModal()">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="card">
+                <strong>Item Details (GR. No. {{ grNo }})</strong>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover table-sm">
+                        <thead>
+                            <tr>
+                                <th>Item Code</th>
+                                <th>Description</th>
+                                <th>Quantity</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let i of repCompletionDetails">
+                                <td> {{ i.itemCode }} </td>
+                                <td> {{ i.description }} </td>
+                                <td> {{ i.quantity }} </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </ng-template>
+</div>

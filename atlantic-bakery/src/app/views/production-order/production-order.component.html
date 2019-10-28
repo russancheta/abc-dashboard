@@ -1,0 +1,90 @@
+<div class="animated fadeIn">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="form-group">
+                <label>Choose Branch</label>
+                <select class="form-control" (change)="onChangeBranch($event.target.value)">
+                    <option *ngFor="let b of branches">
+                        {{ b.name }}
+                    </option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <ngb-tabset>
+        <ngb-tab>
+            <ng-template ngbTabTitle>Production Order <span class="badge badge-primary"></span></ng-template>
+            <ng-template ngbTabContent>
+                <div class="table-responsive">
+                    <table class="table table-hover table-sm">
+                        <thead>
+                            <tr>
+                                <th class="text-center" width="3%"><i class="fa fa-eye"></i></th>
+                                <th class="text-center">Order Status</th>
+                                <th>ITR No.</th>
+                                <th>Branch Name</th>
+                                <th>Document Date</th>
+                                <th>Status</th>
+                                <th>Days Due</th>
+                                <th>Prod. Forecast No.</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr
+                                *ngFor="let o of productionOrder | slice: (page-1) * pageSize : (page-1) * pageSize + pageSize">
+                                <td class="text-center">
+                                    <button type="button" class="btn btn-link btn-sm"
+                                        (click)="openModal(itrModal,o.docNum)">View</button>
+                                </td>
+                                <td class="text-center"> {{ o.docStatus }} </td>
+                                <td popover="Remarks: {{ o.docRemarks }}" triggers="mouseenter:mouseleave">
+                                    {{ o.docNum }} </td>
+                                <td> {{ o.branchName}} </td>
+                                <td> {{ o.docDate | date: 'yyyy-MM-dd' }} </td>
+                                <td> {{ o.status }} </td>
+                                <td> {{ o.daysDue }} </td>
+                                <td> {{ o.prodForecastNo }} </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <ngb-pagination [(page)]="page" [pageSize]="pageSize" [collectionSize]="productionOrder.length"
+                        [boundaryLinks]="true">
+                    </ngb-pagination>
+                </div>
+            </ng-template>
+        </ngb-tab>
+    </ngb-tabset>
+</div>
+<ng-template #itrModal let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title" id="modal-basic-title">Production Order (ITR)</h4>
+        <button type="button" class="close" aria-label="close" (click)="closeModal()">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <div class="card">
+            <strong>Item Details (ITR No. {{ itrNo }} )</strong>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover table-sm">
+                    <thead>
+                        <tr>
+                            <th>Item Code</th>
+                            <th>Description</th>
+                            <th>Quantity</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let o of productionOrderDetails">
+                            <td> {{ o.itemCode }} </td>
+                            <td> {{ o.description }} </td>
+                            <td> {{ o.quantity }} </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</ng-template>
