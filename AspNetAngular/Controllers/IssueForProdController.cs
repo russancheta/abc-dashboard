@@ -37,11 +37,8 @@ namespace AspNetAngular.Controllers
                     A.U_Remarks 'DocRemarks'
                 from
                     OIGE A
-                    --inner join IGE1 B on A.DocEntry = B.DocEntry
                     left join [@BOCODE] D on A.U_BranchCode = D.Code
                 where
-                    --A.DocStatus = 'O'
-                    --A.DocDate between '2019-08-01' and '2019-08-01'
                     D.Name = {0}
                                     ";
             var issueProd = await _context.IssueForProduction.FromSql(issueForProdQuery, branch).ToListAsync();
@@ -57,8 +54,8 @@ namespace AspNetAngular.Controllers
                     b.Dscription 'Description',
                     b.Quantity
                 from
-                    OWTQ a
-                    inner join WTQ1 b on a.DocEntry = b.DocEntry
+                    OIGE a
+                    inner join IGE1 b on a.DocEntry = b.DocEntry
                 where
                     a.DocNum = {0}
                                         ";

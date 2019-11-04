@@ -18,77 +18,202 @@
                 <table class="table table-hover table-sm">
                     <thead>
                         <tr>
-                            <th class="text-center" width="3%"><i class="fa fa-eye"></i></th>
-                            <th class="text-center">Order Status</th>
-                            <th>ITR No.</th>
-                            <!-- <th class="text-center">DR</th> -->
-                            <!-- <th>Customer Code</th> -->
-                            <th>BP Name</th>
                             <th>Doc. Date</th>
-                            <th>Status</th>
+                            <th>SQ No.</th>
                             <th>Days Due</th>
-                            <th>Issue Prod. No.</th>
+                            <th>GI No.</th>
+                            <th>GR No.</th>
+                            <th>Status</th>
                             <th>Remarks</th>
+                            <th>Pick</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr
                             *ngFor="let o of productionForecast | slice: (page-1) * pageSize : (page-1) * pageSize + pageSize">
-                            <td class="text-center">
-                                <button type="button" class="btn btn-link btn-sm"
-                                    (click)="openModal(sqModal, o.docNum)">View</button>
+                            <td>
+                                <ng-template [ngIf]="o.itrNo.includes(', ')" [ngIfElse]="itrOne">
+                                    <div class="btn-group" dropdown>
+                                        <button dropdownToggle type="button"
+                                            class="btn btn-sm btn-outline-info dropdown-toggle">
+                                            ITR No. <span class="caret"></span>
+                                        </button>
+                                        <ul *dropdownMenu class="dropdown-menu" role="menu">
+                                            <li role="menuitem" *ngFor="let i of itrDocNumSplit(o.itrNo)">
+                                                <a class="dropdown-item" (click)="itrDetails(itrModal, i)"> {{ i }} </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </ng-template>
+                                <ng-template #itrOne>
+                                    <button type="button" class="btn btn-sm btn-outline-info">{{ o.itrNo }}</button>
+                                </ng-template>
                             </td>
-                            <td class="text-center"> {{ o.docStatus }} </td>
-                            <td> {{ o.itrNo }}</td>
-                            <td> {{ o.cardName }} </td>
-                            <td> {{ o.docDate | date: 'yyyy-MM-dd' }} </td>
-                            <td> {{ o.status }} </td>
-                            <td> {{ o.daysDue }} </td>
-                            <td class="text-center"> {{ o.goodsIssueNo }} </td>
-                            <td> {{ o.docRemarks }} </td>
+                            <td>
+                                <button style="color: #2980b9" type="button" class="btn btn-link btn-sm"
+                                    (click)="soDetails(sqModal, o.docNum)"> {{ o.docNum }}</button>
+                            </td>
+                            <td>
+                                <button style="color: #c0392b;" type="button" class="btn btn-link btn-sm"
+                                    (click)="giDetails(giModal, o.goodsIssueNo)"> {{ o.goodsIssueNo }} </button>
+                            </td>
+                            <td>
+                                <ng-template [ngIf]="o.grDocNum.includes(', ')" [ngIfElse]="testOne">
+                                    <div class="btn-group" dropdown>
+                                        <button dropdownToggle type="button"
+                                            class="btn btn-sm btn-outline-success dropdown-toggle">
+                                            GR No. <span class="caret"></span>
+                                        </button>
+                                        <ul *dropdownMenu class="dropdown-menu" role="menu">
+                                            <li role="menuitem" *ngFor="let i of arraySplit(o.grDocNum)">
+                                                <a class="dropdown-item" (click)="grDetails(grModal, i)"> {{ i }} </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </ng-template>
+                                <ng-template #testOne>
+                                    <button type="button" class="btn btn-sm btn-outline-success"
+                                        (click)="grDetails(grModal, o.grDocNum)"> {{ o.grDocNum }} </button>
+                                </ng-template>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
-                <ngb-pagination [(page)]="page" [pageSize]="pageSize" [collectionSize]="productionForecast.length">
+                <ngb-pagination [(page)]="page" [pageSize]="pageSize" [collectionSize]="productionForecast.length"
+                    [maxSize]="10">
                 </ngb-pagination>
             </ng-template>
         </ngb-tab>
     </ngb-tabset>
-    <ng-template #sqModal let-modal>
-        <div class="modal-header">
-            <h4 class="modal-title" id="modal-basic-title">Production Forecast (SQ)</h4>
-            <button type="button" class="close" aria-label="close" (click)="closeModal()">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-        <div class="modal-body">
-            <div class="card">
-                <strong>Item Details (SQ No. {{ sqNo }})</strong>
+</div>
+<ng-template #itrModal let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title" id="modal-basic-title">Inv. Transfer Request</h4>
+        <button type="button" class="close" aria-label="close" (click)="closeModal()">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <strong>Item Details (ITR No. {{ itrNo }})</strong>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover table-sm">
+                    <thead>
+                        <tr>
+                            <th>Item Code</th>
+                            <th>Description</th>
+                            <th>Quantity</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let i of invTransferReqDetails">
+                            <td> {{ i.itemCode }} </td>
+                            <td> {{ i.description }} </td>
+                            <td> {{ i.quantity }} </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-hover table-sm">
-                        <thead>
-                            <tr>
-                                <th>Item Code</th>
-                                <th>Description</th>
-                                <th>Quantity</th>
-                                <th>Price</th>
-                                <th>Total</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr *ngFor="let i of productionForecastDetails">
-                                <td> {{ i.itemCode }} </td>
-                                <td> {{ i.description }} </td>
-                                <td> {{ i.quantity }} </td>
-                                <td> {{ i.priceAfVAT }} </td>
-                                <td> {{ i.lineTotal }} </td>
-                            </tr>
-                        </tbody>
-                    </table>
+        </div>
+    </div>
+</ng-template>
+<ng-template #sqModal let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title" id="modal-basic-title">Production Forecast (SQ)</h4>
+        <button type="button" class="close" aria-label="close" (click)="closeModal()">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <strong>Item Details (SQ No. {{ sqNo }})</strong>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-lg-6">
+                    <div style="overflow-x: auto; height: 450px;">
+                        <table class="table table-hover table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Item Code</th>
+                                    <th>Description</th>
+                                    <th>Quantity</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let i of productionForecastDetails">
+                                    <td> {{ i.itemCode }} </td>
+                                    <td> {{ i.description }} </td>
+                                    <td> {{ i.quantity }} </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+
                 </div>
             </div>
         </div>
-    </ng-template>
-</div>
+    </div>
+</ng-template>
+<ng-template #giModal let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title" id="modal-basic-title">Goods Issue</h4>
+        <button type="button" class="close" aria-label="close" (click)="closeModal()">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <strong>Item Details (GI No. {{ giNo }})</strong>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover table-sm">
+                    <thead>
+                        <tr>
+                            <th>Item Code</th>
+                            <th>Description</th>
+                            <th>Quantity</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let i of goodsIssueDetails">
+                            <td> {{ i.itemCode }} </td>
+                            <td> {{ i.description }} </td>
+                            <td> {{ i.quantity }} </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</ng-template>
+<ng-template #grModal let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title" id="modal-basic-title">Goods Receipt</h4>
+        <button type="button" class="close" aria-label="close" (click)="closeModal()">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <strong>Item Details (GR No. {{ grNo }})</strong>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover table-sm">
+                    <thead>
+                        <tr>
+                            <th>Item Code</th>
+                            <th>Description</th>
+                            <th>Quantity</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let i of goodsReceiptDetails">
+                            <td> {{ i.itemCode }} </td>
+                            <td> {{ i.description }} </td>
+                            <td> {{ i.quantity }} </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</ng-template>

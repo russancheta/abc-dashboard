@@ -20,13 +20,15 @@
                         <thead>
                             <tr>
                                 <th class="text-center" width="3%"><i class="fa fa-eye"></i></th>
-                                <th class="text-center">Order Status</th>
+                                <th class="text-center">Doc. Date</th>
+                                <th>From</th>
+                                <th>To</th>
                                 <th>ITR No.</th>
-                                <th>Branch Name</th>
-                                <th>Document Date</th>
-                                <th>Status</th>
                                 <th>Days Due</th>
-                                <th>Prod. Forecast No.</th>
+                                <th>IT No.</th>
+                                <th>Status</th>
+                                <th>Remarks</th>
+                                <th>Pick</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -36,19 +38,17 @@
                                     <button type="button" class="btn btn-link btn-sm"
                                         (click)="openModal(itrModal,o.docNum)">View</button>
                                 </td>
-                                <td class="text-center"> {{ o.docStatus }} </td>
+                                <td class="text-center"> {{ o.docDate | date: 'yyyy-MM-dd' }} </td>
+                                <td> {{ o.branchName}} </td>
                                 <td popover="Remarks: {{ o.docRemarks }}" triggers="mouseenter:mouseleave">
                                     {{ o.docNum }} </td>
-                                <td> {{ o.branchName}} </td>
-                                <td> {{ o.docDate | date: 'yyyy-MM-dd' }} </td>
                                 <td> {{ o.status }} </td>
                                 <td> {{ o.daysDue }} </td>
-                                <td> {{ o.prodForecastNo }} </td>
                             </tr>
                         </tbody>
                     </table>
                     <ngb-pagination [(page)]="page" [pageSize]="pageSize" [collectionSize]="productionOrder.length"
-                        [boundaryLinks]="true">
+                        [boundaryLinks]="true" [maxSize]="10">
                     </ngb-pagination>
                 </div>
             </ng-template>
@@ -63,9 +63,7 @@
         </button>
     </div>
     <div class="modal-body">
-        <div class="card">
-            <strong>Item Details (ITR No. {{ itrNo }} )</strong>
-        </div>
+        <strong>Item Details (ITR No. {{ itrNo }} )</strong>
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-hover table-sm">
@@ -73,7 +71,8 @@
                         <tr>
                             <th>Item Code</th>
                             <th>Description</th>
-                            <th>Quantity</th>
+                            <th>ITR Quantity</th>
+                            <th>IT Quantity</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -81,6 +80,7 @@
                             <td> {{ o.itemCode }} </td>
                             <td> {{ o.description }} </td>
                             <td> {{ o.quantity }} </td>
+                            <td> {{ o.itQuantity }} </td>
                         </tr>
                     </tbody>
                 </table>

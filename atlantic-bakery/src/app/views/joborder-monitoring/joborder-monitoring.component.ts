@@ -57,7 +57,4 @@ export class JoborderMonitoringComponent implements OnInit {
     })
   }
 
-  onChangeBranch(branch: string) {
-    this.getIssueForProd(branch);
-  }
 }

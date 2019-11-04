@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\rpo\\Desktop\\atlantic\\AspNetAngular\\AspNetAngular.csproj": {}
+    "C:\\atlantic\\abc-dashboard\\AspNetAngular\\AspNetAngular.csproj": {}
   },
   "projects": {
-    "C:\\Users\\rpo\\Desktop\\atlantic\\AspNetAngular\\AspNetAngular.csproj": {
+    "C:\\atlantic\\abc-dashboard\\AspNetAngular\\AspNetAngular.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\rpo\\Desktop\\atlantic\\AspNetAngular\\AspNetAngular.csproj",
+        "projectUniqueName": "C:\\atlantic\\abc-dashboard\\AspNetAngular\\AspNetAngular.csproj",
         "projectName": "AspNetAngular",
-        "projectPath": "C:\\Users\\rpo\\Desktop\\atlantic\\AspNetAngular\\AspNetAngular.csproj",
+        "projectPath": "C:\\atlantic\\abc-dashboard\\AspNetAngular\\AspNetAngular.csproj",
         "packagesPath": "C:\\Users\\rpo\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\rpo\\Desktop\\atlantic\\AspNetAngular\\obj\\",
+        "outputPath": "C:\\atlantic\\abc-dashboard\\AspNetAngular\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
@@ -45,11 +45,32 @@
               "target": "Package",
               "version": "[5.0.1, )"
             },
+            "Automapper": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            },
+            "FluentValidation.AspNetCore": {
+              "target": "Package",
+              "version": "[8.1.2, )"
+            },
             "Microsoft.AspNetCore.App": {
               "suppressParent": "All",
               "target": "Package",
               "version": "[2.2.0, )",
               "autoReferenced": true
+            },
+            "Microsoft.AspNetCore.Authentication.JwtBearer": {
+              "target": "Package",
+              "version": "[2.2.0, )"
+            },
+            "Microsoft.AspNetCore.Razor.Design": {
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[2.2.0, )"
+            },
+            "Microsoft.IdentityModel.Tokens": {
+              "target": "Package",
+              "version": "[5.3.0, )"
             },
             "Microsoft.NETCore.App": {
               "suppressParent": "All",
@@ -60,6 +81,10 @@
             "Swashbuckle.AspNetCore": {
               "target": "Package",
               "version": "[5.0.0-rc2, )"
+            },
+            "System.IdentityModel.Tokens.Jwt": {
+              "target": "Package",
+              "version": "[5.3.0, )"
             }
           },
           "imports": [

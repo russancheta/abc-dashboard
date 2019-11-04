@@ -22,7 +22,7 @@ export class Service {
 
     constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
         this.http = http;
-        this.baseUrl = baseUrl ? baseUrl : "http://localhost:5000";
+        this.baseUrl = baseUrl ? baseUrl : "";
     }
 
     /**
@@ -962,6 +962,7 @@ export class ProductionForecast implements IProductionForecast {
     status?: string;
     daysDue?: number;
     goodsIssueNo?: string;
+    grDocNum?: string;
     docRemarks?: string;
 
     constructor(data?: IProductionForecast) {
@@ -983,6 +984,7 @@ export class ProductionForecast implements IProductionForecast {
             this.status = data["status"];
             this.daysDue = data["daysDue"];
             this.goodsIssueNo = data["goodsIssueNo"];
+            this.grDocNum = data["grDocNum"];
             this.docRemarks = data["docRemarks"];
         }
     }
@@ -1004,6 +1006,7 @@ export class ProductionForecast implements IProductionForecast {
         data["status"] = this.status;
         data["daysDue"] = this.daysDue;
         data["goodsIssueNo"] = this.goodsIssueNo;
+        data["grDocNum"] = this.grDocNum;
         data["docRemarks"] = this.docRemarks;
         return data; 
     }
@@ -1018,6 +1021,7 @@ export interface IProductionForecast {
     status?: string;
     daysDue?: number;
     goodsIssueNo?: string;
+    grDocNum?: string;
     docRemarks?: string;
 }
 
@@ -1141,6 +1145,7 @@ export class ProdOrderDetails implements IProdOrderDetails {
     itemCode?: string;
     description?: string;
     quantity?: number;
+    itQuantity?: number;
 
     constructor(data?: IProdOrderDetails) {
         if (data) {
@@ -1156,6 +1161,7 @@ export class ProdOrderDetails implements IProdOrderDetails {
             this.itemCode = data["itemCode"];
             this.description = data["description"];
             this.quantity = data["quantity"];
+            this.itQuantity = data["itQuantity"];
         }
     }
 
@@ -1171,6 +1177,7 @@ export class ProdOrderDetails implements IProdOrderDetails {
         data["itemCode"] = this.itemCode;
         data["description"] = this.description;
         data["quantity"] = this.quantity;
+        data["itQuantity"] = this.itQuantity;
         return data; 
     }
 }
@@ -1179,6 +1186,7 @@ export interface IProdOrderDetails {
     itemCode?: string;
     description?: string;
     quantity?: number;
+    itQuantity?: number;
 }
 
 export class ReportCompletion implements IReportCompletion {

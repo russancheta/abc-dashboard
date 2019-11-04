@@ -20,11 +20,14 @@ namespace AspNetAngular
     {
         readonly string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
+        private const string SecretKey = "iNivDmHLpUA223sqsfhqGbMRdRj1PVkH";
+
+        //private readonly SymmetricSecurityKey _signingKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(SecretKey));
+        
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
         }
-
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -33,6 +36,8 @@ namespace AspNetAngular
             services.AddDbContext<AtlanticContext>(options => 
                 options.UseSqlServer(
                     Configuration.GetConnectionString("SQLConnection")));
+            
+            // services.AddDbContext<Auth
 
             services.AddCors(options => {
                             options.AddPolicy(MyAllowSpecificOrigins,

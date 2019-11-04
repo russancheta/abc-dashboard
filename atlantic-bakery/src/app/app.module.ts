@@ -55,7 +55,12 @@ import { GoodsReceiptComponent } from './views/goods-receipt/goods-receipt.compo
 import { JoborderMonitoringComponent } from './views/joborder-monitoring/joborder-monitoring.component';
 
 // Import API Service
-import { Service } from './core/api.client'
+import { Service } from './core/api.client';
+
+// NSWAG client
+import { API_BASE_URL } from './core/api.client';
+import { } from '../environments/environment';
+import { environment } from '../environments/environment.prod';
 
 @NgModule({
   imports: [
@@ -90,7 +95,14 @@ import { Service } from './core/api.client'
     GoodsReceiptComponent,
     JoborderMonitoringComponent
   ],
-  providers: [Service, HttpClientModule],
-  bootstrap: [ AppComponent ]
+  providers: [Service, 
+    HttpClientModule,
+    {
+      provide: API_BASE_URL, useFactory: () => {
+        return environment.API_BASE_URL;
+      }
+    }
+  ],
+  bootstrap: [AppComponent]
 })
 export class AppModule { }

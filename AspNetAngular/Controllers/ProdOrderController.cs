@@ -73,10 +73,12 @@ namespace AspNetAngular.Controllers
                 select
                     b.ItemCode,
                     b.Dscription 'Description',
-                    b.Quantity
+                    b.Quantity,
+                    isnull(c.Quantity,0) 'ITQuantity'
                 from
                     OWTQ a
                     inner join WTQ1 b on a.DocEntry = b.DocEntry
+                    left join WTR1 c on b.DocEntry = c.BaseEntry and b.LineNum = c.BaseLine and b.ObjType = c.BaseType
                 where
                     a.DocNum = {0}
                             ";

@@ -12,6 +12,7 @@ namespace AspNetAngular.Model
         public string Status { get; set; }
         public int DaysDue { get; set; }
         public string GoodsIssueNo { get; set; }
+        public string GRDocNum { get; set; }
         public string DocRemarks{ get; set; }
     }
 }

@@ -31,21 +31,26 @@ namespace AspNetAngular.Controllers
                         else 'Close'
                     end 'DocStatus',
                     A.DocNum,
-                    '' 'ITRNo',
+                    replace(a.Comments, 'ITR No. ', '') 'ITRNo',
                     A.CardName,
                     A.DocDate,
                     '' 'Status',
                     (select datediff(d, z.DocDate, GETDATE()) from OQUT z where z.DocEntry = A.DocEntry and z.DocStatus = 'O') 'DaysDue',
                     cast(A.U_GIDocNum as varchar(50)) 'GoodsIssueNo',
+                    isnull((STUFF(( SELECT distinct ', ' + cast(z.DocNum as nvarchar(50))
+						FROM OIGN z
+						WHERE z.U_FCDocNum = a.DocNum
+						FOR XML PATH('')
+						)
+						,1,2,'')), '') 'GRDocNum',
                     A.U_Remarks 'DocRemarks'
                 from
                     OQUT A
                     left join [@BOCODE] D on A.U_BranchCode = D.Code
                 where
                     A.DocStatus = 'O'
-                    --and A.DocDate between '2019-08-01' and '2019-08-08'
                     and D.Name = {0}
-                                    ";
+                    and A.Comments like 'ITR N%'";
             var prodForecast = await _context.ProductionForecast.FromSql(prodForecastQuery, branch).ToListAsync();
             return prodForecast;
         }

@@ -44,28 +44,13 @@ export const navItems: NavData[] = [
     name: 'Main'
   },
   {
-    name: 'Production Order (ITR)',
+    name: 'Production Monitoring',
+    url: '/for-production',
+    icon: 'fa fa-paste'
+  },
+  {
+    name: 'ITR / IT Monitoring',
     url: '/production-order',
     icon: 'fa fa-copy'
-  },
-  {
-    name: 'Issue For Production (GI)',
-    url: '/goods-issue',
-    icon: 'fa fa-file'
-  },
-  {
-    name: 'Report Completion (GR)',
-    url: '/goods-receipt',
-    icon: 'fa fa-check'
-  },
-  {
-    name: 'Production Forecast (SQ)',
-    url: '/for-production',
-    icon: 'fa fa-paste' 
-  },
-  {
-    name: 'Job Order Monitoring (PO)',
-    url: '/joborder-monitoring',
-    icon: 'fa fa-desktop'
   }
 ];
