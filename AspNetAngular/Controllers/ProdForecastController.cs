@@ -93,18 +93,22 @@ namespace AspNetAngular.Controllers
         public async Task<ActionResult<IEnumerable<SQGRDifference>>> getSQGRDifference(int docentry)
         {
             var sqgrDifference = @"
-                SELECT 
+				SELECT 
                     T1.ItemCode, 
                     T1.Dscription, 
-                    sum(T1.Quantity) 'Quantity'
+					isnull(T3.Quantity,0) 'SQQuantity',
+                    sum(isnull(T1.Quantity,0)) 'GRQuantity'
                 FROM 
                     OIGN T0 
-                    INNER JOIN IGN1 T1 ON T0.DocEntry = T1.DocEntry 
+                    INNER JOIN IGN1 T1 ON T0.DocEntry = T1.DocEntry
+					LEFT JOIN OQUT T2 ON T0.U_FCDocEntry = T2.DocEntry
+					LEFT JOIN QUT1 T3 ON T2.DocEntry = T3.DocEntry and t1.ItemCode = t3.ItemCode
                 WHERE 
                     T0.U_FCDocEntry = {0}
-                GROUP 
-                    BY T1.ItemCode, 
-                    T1.Dscription
+                GROUP BY 
+					T1.ItemCode, 
+                    T1.Dscription,
+					T3.Quantity
                 ORDER BY
                     T1.ItemCode";
             var sqgrResult = await _context.SQGRDifference.FromSql(sqgrDifference, docentry).ToListAsync();

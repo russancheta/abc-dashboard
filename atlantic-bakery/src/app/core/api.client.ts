@@ -1136,7 +1136,8 @@ export interface IProductionForecastDetails {
 export class SQGRDifference implements ISQGRDifference {
     itemCode?: string;
     dscription?: string;
-    quantity?: number;
+    sqQuantity?: number;
+    grQuantity?: number;
 
     constructor(data?: ISQGRDifference) {
         if (data) {
@@ -1151,7 +1152,8 @@ export class SQGRDifference implements ISQGRDifference {
         if (data) {
             this.itemCode = data["itemCode"];
             this.dscription = data["dscription"];
-            this.quantity = data["quantity"];
+            this.sqQuantity = data["sqQuantity"];
+            this.grQuantity = data["grQuantity"];
         }
     }
 
@@ -1166,7 +1168,8 @@ export class SQGRDifference implements ISQGRDifference {
         data = typeof data === 'object' ? data : {};
         data["itemCode"] = this.itemCode;
         data["dscription"] = this.dscription;
-        data["quantity"] = this.quantity;
+        data["sqQuantity"] = this.sqQuantity;
+        data["grQuantity"] = this.grQuantity;
         return data; 
     }
 }
@@ -1174,7 +1177,8 @@ export class SQGRDifference implements ISQGRDifference {
 export interface ISQGRDifference {
     itemCode?: string;
     dscription?: string;
-    quantity?: number;
+    sqQuantity?: number;
+    grQuantity?: number;
 }
 
 export class ProductionOrder implements IProductionOrder {

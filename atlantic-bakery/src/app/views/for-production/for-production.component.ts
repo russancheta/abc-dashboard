@@ -131,12 +131,12 @@ export class ForProductionComponent implements OnInit {
     this.grNo = grNo.toString();
   }
 
-  sqGrDifference(content: any, sqNo: number, docEntry: number) {
-    this.getProdForecastDetails(sqNo);
+  sqGrDifference(content: any, docEntry: number) {
     this.apiService.sqgrDifference(docEntry).subscribe(response => {
       this.sumGoodsReceiptDetails = response;
+      console.table(response);
     })
-    this.modalRef = this.modalService.show(content, { backdrop: 'static', class: 'modal-xl' })
+    this.modalRef = this.modalService.show(content, { backdrop: 'static', class: 'modal-lg' })
   }
 
   closeModal() {

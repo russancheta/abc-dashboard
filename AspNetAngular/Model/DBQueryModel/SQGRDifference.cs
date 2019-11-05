@@ -6,6 +6,7 @@ namespace AspNetAngular.Model
     {
         public string ItemCode { get; set; }
         public string Dscription { get; set; }
-        public decimal Quantity { get; set; }
+        public decimal SQQuantity { get; set; }
+        public decimal GRQuantity { get; set; }
     }
 }

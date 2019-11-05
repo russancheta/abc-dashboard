@@ -80,7 +80,7 @@
                             </td>
                             <td>
                                 <button type="button" class="btn btn-link btn-sm"
-                                    (click)="sqGrDifference(sqgrModal, o.docNum, o.docEntry)"> {{ o.status }} </button>
+                                    (click)="sqGrDifference(sqgrModal, o.docEntry)"> {{ o.status }} </button>
                             </td>
                             <td>
                                 <button type="button"><i class="fa fa-pencil-square-o fa-lg"></i></button>
@@ -233,56 +233,34 @@
 </ng-template>
 <ng-template #sqgrModal let-modal>
     <div class="modal-header">
-        <h4 class="modal-title" id="modal-basic-title">Difference</h4>
+        <h4 class="modal-title" id="modal-basic-title">SQ GR Difference</h4>
         <button type="button" class="close" aria-label="close" (click)="closeModal()">
             <span aria-hidden="true">&times;</span>
         </button>
     </div>
     <div class="modal-body">
+        <strong>Item Details</strong>
         <div class="card-body">
-            <div class="row">
-                <div class="col-lg-6">
-                    <strong>Item Details (SQ No. {{ sqNo }})</strong>
-                    <div style="overflow-x: auto; height: 450px;">
-                        <table class="table table-hover table-sm">
-                            <thead>
-                                <tr>
-                                    <th>Item Code</th>
-                                    <th>Description</th>
-                                    <th>Quantity</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr *ngFor="let i of productionForecastDetails">
-                                    <td> {{ i.itemCode }} </td>
-                                    <td> {{ i.description }} </td>
-                                    <td> {{ i.quantity }} </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <div class="col-lg-6">
-                    <strong>Item Details (GR No. {{ sqNo }})</strong>
-                    <div style="overflow-x: auto; height: 450px;">
-                        <table class="table table-hover table-sm">
-                            <thead>
-                                <tr>
-                                    <th>Item Code</th>
-                                    <th>Description</th>
-                                    <th>Quantity</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr *ngFor="let i of sumGoodsReceiptDetails">
-                                    <td> {{ i.itemCode }} </td>
-                                    <td> {{ i.dscription }} </td>
-                                    <td> {{ i.quantity }} </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+            <div class="table-responsive">
+                <table class="table table-hover table-sm">
+                    <thead>
+                        <tr>
+                            <th>Item Code</th>
+                            <th>Description</th>
+                            <th>SQ Quantity</th>
+                            <th>GR Quantity</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let i of sumGoodsReceiptDetails"
+                            [ngClass]="i.sqQuantity > i.grQuantity || i.grQuantity > i.sqQuantity ? 'table-warning' : '' ">
+                            <td> {{ i.itemCode }} </td>
+                            <td> {{ i.dscription }} </td>
+                            <td> {{ i.sqQuantity }} </td>
+                            <td> {{ i.grQuantity }} </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
