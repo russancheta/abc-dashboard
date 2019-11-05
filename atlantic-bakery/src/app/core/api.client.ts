@@ -441,6 +441,66 @@ export class Service {
     }
 
     /**
+     * @param docentry (optional) 
+     * @return Success
+     */
+    sqgrDifference(docentry: number | undefined): Observable<SQGRDifference[]> {
+        let url_ = this.baseUrl + "/api/controllers/sqgrDifference?";
+        if (docentry === null)
+            throw new Error("The parameter 'docentry' cannot be null.");
+        else if (docentry !== undefined)
+            url_ += "docentry=" + encodeURIComponent("" + docentry) + "&"; 
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSqgrDifference(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSqgrDifference(<any>response_);
+                } catch (e) {
+                    return <Observable<SQGRDifference[]>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<SQGRDifference[]>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processSqgrDifference(response: HttpResponseBase): Observable<SQGRDifference[]> {
+        const status = response.status;
+        const responseBlob = 
+            response instanceof HttpResponse ? response.body : 
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200.push(SQGRDifference.fromJS(item));
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<SQGRDifference[]>(<any>null);
+    }
+
+    /**
      * @param branch (optional) 
      * @return Success
      */
@@ -954,16 +1014,15 @@ export interface IJobOrderDetails {
 }
 
 export class ProductionForecast implements IProductionForecast {
-    docStatus?: string;
-    docNum?: number;
     itrNo?: string;
-    cardName?: string;
     docDate?: Date;
-    status?: string;
+    docNum?: number;
     daysDue?: number;
     goodsIssueNo?: string;
     grDocNum?: string;
+    status?: string;
     docRemarks?: string;
+    docEntry?: number;
 
     constructor(data?: IProductionForecast) {
         if (data) {
@@ -976,16 +1035,15 @@ export class ProductionForecast implements IProductionForecast {
 
     init(data?: any) {
         if (data) {
-            this.docStatus = data["docStatus"];
-            this.docNum = data["docNum"];
             this.itrNo = data["itrNo"];
-            this.cardName = data["cardName"];
             this.docDate = data["docDate"] ? new Date(data["docDate"].toString()) : <any>undefined;
-            this.status = data["status"];
+            this.docNum = data["docNum"];
             this.daysDue = data["daysDue"];
             this.goodsIssueNo = data["goodsIssueNo"];
             this.grDocNum = data["grDocNum"];
+            this.status = data["status"];
             this.docRemarks = data["docRemarks"];
+            this.docEntry = data["docEntry"];
         }
     }
 
@@ -998,31 +1056,29 @@ export class ProductionForecast implements IProductionForecast {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["docStatus"] = this.docStatus;
-        data["docNum"] = this.docNum;
         data["itrNo"] = this.itrNo;
-        data["cardName"] = this.cardName;
         data["docDate"] = this.docDate ? this.docDate.toISOString() : <any>undefined;
-        data["status"] = this.status;
+        data["docNum"] = this.docNum;
         data["daysDue"] = this.daysDue;
         data["goodsIssueNo"] = this.goodsIssueNo;
         data["grDocNum"] = this.grDocNum;
+        data["status"] = this.status;
         data["docRemarks"] = this.docRemarks;
+        data["docEntry"] = this.docEntry;
         return data; 
     }
 }
 
 export interface IProductionForecast {
-    docStatus?: string;
-    docNum?: number;
     itrNo?: string;
-    cardName?: string;
     docDate?: Date;
-    status?: string;
+    docNum?: number;
     daysDue?: number;
     goodsIssueNo?: string;
     grDocNum?: string;
+    status?: string;
     docRemarks?: string;
+    docEntry?: number;
 }
 
 export class ProductionForecastDetails implements IProductionForecastDetails {
@@ -1075,6 +1131,50 @@ export interface IProductionForecastDetails {
     quantity?: number;
     priceAfVAT?: number;
     lineTotal?: number;
+}
+
+export class SQGRDifference implements ISQGRDifference {
+    itemCode?: string;
+    dscription?: string;
+    quantity?: number;
+
+    constructor(data?: ISQGRDifference) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            this.itemCode = data["itemCode"];
+            this.dscription = data["dscription"];
+            this.quantity = data["quantity"];
+        }
+    }
+
+    static fromJS(data: any): SQGRDifference {
+        data = typeof data === 'object' ? data : {};
+        let result = new SQGRDifference();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["itemCode"] = this.itemCode;
+        data["dscription"] = this.dscription;
+        data["quantity"] = this.quantity;
+        return data; 
+    }
+}
+
+export interface ISQGRDifference {
+    itemCode?: string;
+    dscription?: string;
+    quantity?: number;
 }
 
 export class ProductionOrder implements IProductionOrder {

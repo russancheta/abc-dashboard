@@ -11,9 +11,6 @@ import { RegisterComponent } from './views/register/register.component';
 import { ABCDashboardComponent } from './views/abc-dashboard/abc-dashboard.component';
 import { ProductionOrderComponent } from './views/production-order/production-order.component';
 import { ForProductionComponent } from './views/for-production/for-production.component';
-import { GoodsIssueComponent } from './views/goods-issue/goods-issue.component';
-import { GoodsReceiptComponent } from './views/goods-receipt/goods-receipt.component';
-import { JoborderMonitoringComponent } from './views/joborder-monitoring/joborder-monitoring.component';
 
 export const routes: Routes = [
   {
@@ -67,35 +64,14 @@ export const routes: Routes = [
         path: 'production-order',
         component: ProductionOrderComponent,
         data: {
-          title: 'Production Order (ITR)'
+          title: 'ITR/IT Monitoring'
         }
       },
       {
         path: 'for-production',
         component: ForProductionComponent,
         data: {
-          title: 'Production Forecast (SQ)'
-        }
-      },
-      {
-        path: 'goods-issue',
-        component: GoodsIssueComponent,
-        data: {
-          title: 'Issue For Production (GI)'
-        }
-      },
-      {
-        path: 'goods-receipt',
-        component: GoodsReceiptComponent,
-        data: {
-          title: 'Report Completion (GR)'
-        }
-      },
-      {
-        path: 'joborder-monitoring',
-        component: JoborderMonitoringComponent,
-        data: {
-          title: 'Job Order Monitoring'
+          title: 'Production Monitoring'
         }
       },
       {

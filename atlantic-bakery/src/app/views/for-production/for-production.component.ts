@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ProductionForecast, ProductionForecastDetails } from '../../core/api.client';
+import { ProductionForecast, ProductionForecastDetails, SQGRDifference } from '../../core/api.client';
 import { IssueForProdDetails } from '../../core/api.client';
 import { RepCompletionDetails } from '../../core/api.client';
 import { ProdOrderDetails } from '../../core/api.client';
@@ -25,6 +25,8 @@ export class ForProductionComponent implements OnInit {
   goodsIssueDetails: IssueForProdDetails[] = [];
 
   goodsReceiptDetails: RepCompletionDetails[] = [];
+
+  sumGoodsReceiptDetails: SQGRDifference[] = [];
 
   branch = '';
   branches: Branches[] = [];
@@ -59,7 +61,7 @@ export class ForProductionComponent implements OnInit {
     this.apiService.getProductionForecast(branch).subscribe(response => {
       this.productionForecast = response;
       Swal.close();
-      console.log(response[0].itrNo);
+      console.table(response);
     })
   }
 
@@ -127,6 +129,14 @@ export class ForProductionComponent implements OnInit {
     this.getGoodsReceiptDetails(grNo);
     this.modalRef = this.modalService.show(content, { backdrop: 'static', class: 'modal-xl' });
     this.grNo = grNo.toString();
+  }
+
+  sqGrDifference(content: any, sqNo: number, docEntry: number) {
+    this.getProdForecastDetails(sqNo);
+    this.apiService.sqgrDifference(docEntry).subscribe(response => {
+      this.sumGoodsReceiptDetails = response;
+    })
+    this.modalRef = this.modalService.show(content, { backdrop: 'static', class: 'modal-xl' })
   }
 
   closeModal() {

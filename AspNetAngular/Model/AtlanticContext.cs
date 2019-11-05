@@ -23,6 +23,7 @@ namespace AspNetAngular.Model
         public virtual DbQuery<RepCompletionDetails> RepCompletionDetails { get; set; }
         public virtual DbQuery<ProductionForecast> ProductionForecast { get; set; }
         public virtual DbQuery<ProductionForecastDetails> ProductionForecastDetails { get; set; }
+        public virtual DbQuery<SQGRDifference> SQGRDifference { get; set; }
         public virtual DbQuery<JobOrder> JobOrder { get; set; }
         public virtual DbQuery<JobOrderDetails> JobOrderDetails { get; set; }
         public virtual DbQuery<Branches> Branches { get; set;}

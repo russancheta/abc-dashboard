@@ -62,8 +62,7 @@ namespace AspNetAngular.Controllers
                     OIGN a
                     inner join IGN1 b on a.DocEntry = b.DocEntry
                 where
-                    a.DocNum = {0}
-                            ";
+                    a.DocNum = {0}";
             var repCompDetails = await _context.RepCompletionDetails.FromSql(rawQuery, docnum).ToListAsync();
             return repCompDetails;
         }
