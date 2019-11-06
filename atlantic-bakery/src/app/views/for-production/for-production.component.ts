@@ -39,11 +39,18 @@ export class ForProductionComponent implements OnInit {
   grNo = '';
 
   modalRef: BsModalRef;
+  modalRefRemarks: BsModalRef;
   modalOption: ModalOptions = {};
 
-  //pagination
+  // pagination
   page = 1;
   pageSize = 10;
+
+  // Footer Fields Modal
+  sqQuantityTotal: number = 0;
+  grQuantityTotal: number = 0;
+
+  // Remarks Declaration
 
   constructor(
     private apiService: Service,
@@ -52,7 +59,7 @@ export class ForProductionComponent implements OnInit {
 
   ngOnInit() {
     this.getBranches();
-    //this.getProdForecast(this.branches[0].name);
+    // this.getProdForecast(this.branches[0].name);
   }
 
   getProdForecast(branch: string) {
@@ -62,39 +69,39 @@ export class ForProductionComponent implements OnInit {
       this.productionForecast = response;
       Swal.close();
       console.table(response);
-    })
+    });
   }
 
   getProdForecastDetails(docnum: number) {
     this.apiService.getProductionForecastDetails(docnum).subscribe(response => {
       this.productionForecastDetails = response;
-    })
+    });
   }
 
   getGoodsIssueDetails(docNum: number) {
     this.apiService.getIssueProdDetails(docNum).subscribe(response => {
       this.goodsIssueDetails = response;
       console.table(response);
-    })
+    });
   }
 
   getGoodsReceiptDetails(docNum: number) {
     this.apiService.getRepCompletionDetails(docNum).subscribe(response => {
       this.goodsReceiptDetails = response;
-    })
+    });
   }
 
   getInvTransferReqDetails(docNum: number) {
     this.apiService.getProdDetails(docNum).subscribe(response => {
       this.invTransferReqDetails = response;
-    })
+    });
   }
 
   getBranches() {
     this.apiService.getBranchList().subscribe(response => {
       this.branches = response;
       console.log(response);
-    })
+    });
   }
 
   arraySplit(docNum: string) {
@@ -134,8 +141,10 @@ export class ForProductionComponent implements OnInit {
   sqGrDifference(content: any, docEntry: number) {
     this.apiService.sqgrDifference(docEntry).subscribe(response => {
       this.sumGoodsReceiptDetails = response;
+      this.sqQuantityTotal = response.reduce((r, d) => r + d.sqQuantity, 0);
+      this.grQuantityTotal = response.reduce((r, d) => r + d.grQuantity, 0);
       console.table(response);
-    })
+    });
     this.modalRef = this.modalService.show(content, { backdrop: 'static', class: 'modal-lg' })
   }
 
@@ -143,8 +152,22 @@ export class ForProductionComponent implements OnInit {
     this.modalRef.hide();
   }
 
+  closeModalRemarks() {
+    this.modalRefRemarks.hide();
+  }
+
   onChangeBranch(branch: string) {
     this.getProdForecast(branch);
+  }
+
+  openModalListRemarks(content: any, sqNo: number) {
+    this.sqNo = sqNo.toString();
+    this.modalRef = this.modalService.show(content, { backdrop: 'static' });
+  }
+
+  openModalRemarks(content: any) {
+    console.log('Open Modal Remarks');
+    this.modalRefRemarks = this.modalService.show(content, { backdrop: 'static' });
   }
 
   showLoading() {
@@ -153,6 +176,6 @@ export class ForProductionComponent implements OnInit {
       text: 'Please wait',
       showConfirmButton: false,
       allowOutsideClick: false
-    })
+    });
   }
 }
