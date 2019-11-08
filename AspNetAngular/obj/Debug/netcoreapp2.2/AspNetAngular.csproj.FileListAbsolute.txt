@@ -12,3 +12,17 @@ D:\jpoon\abc-dashboard\AspNetAngular\obj\Debug\netcoreapp2.2\AspNetAngular.Assem
 D:\jpoon\abc-dashboard\AspNetAngular\obj\Debug\netcoreapp2.2\AspNetAngular.RazorTargetAssemblyInfo.cache
 D:\jpoon\abc-dashboard\AspNetAngular\obj\Debug\netcoreapp2.2\AspNetAngular.dll
 D:\jpoon\abc-dashboard\AspNetAngular\obj\Debug\netcoreapp2.2\AspNetAngular.pdb
+C:\atlantic\abc-dashboard\AspNetAngular\bin\Debug\netcoreapp2.2\AspNetAngular.deps.json
+C:\atlantic\abc-dashboard\AspNetAngular\bin\Debug\netcoreapp2.2\AspNetAngular.runtimeconfig.json
+C:\atlantic\abc-dashboard\AspNetAngular\bin\Debug\netcoreapp2.2\AspNetAngular.runtimeconfig.dev.json
+C:\atlantic\abc-dashboard\AspNetAngular\bin\Debug\netcoreapp2.2\AspNetAngular.dll
+C:\atlantic\abc-dashboard\AspNetAngular\bin\Debug\netcoreapp2.2\AspNetAngular.pdb
+C:\atlantic\abc-dashboard\AspNetAngular\obj\Debug\netcoreapp2.2\AspNetAngular.csprojAssemblyReference.cache
+C:\atlantic\abc-dashboard\AspNetAngular\obj\Debug\netcoreapp2.2\AspNetAngular.csproj.CoreCompileInputs.cache
+C:\atlantic\abc-dashboard\AspNetAngular\obj\Debug\netcoreapp2.2\AspNetAngular.RazorAssemblyInfo.cache
+C:\atlantic\abc-dashboard\AspNetAngular\obj\Debug\netcoreapp2.2\AspNetAngular.RazorAssemblyInfo.cs
+C:\atlantic\abc-dashboard\AspNetAngular\obj\Debug\netcoreapp2.2\AspNetAngular.AssemblyInfoInputs.cache
+C:\atlantic\abc-dashboard\AspNetAngular\obj\Debug\netcoreapp2.2\AspNetAngular.AssemblyInfo.cs
+C:\atlantic\abc-dashboard\AspNetAngular\obj\Debug\netcoreapp2.2\AspNetAngular.RazorTargetAssemblyInfo.cache
+C:\atlantic\abc-dashboard\AspNetAngular\obj\Debug\netcoreapp2.2\AspNetAngular.dll
+C:\atlantic\abc-dashboard\AspNetAngular\obj\Debug\netcoreapp2.2\AspNetAngular.pdb

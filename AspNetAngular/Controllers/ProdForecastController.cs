@@ -53,7 +53,7 @@ namespace AspNetAngular.Controllers
                 where
                     A.DocStatus = 'O'
                     and D.Name = {0}
-                    and A.Comments like 'ITR N%'
+                    --and A.Comments like 'ITR N%'
 				group by
 					A.Comments,
 					A.DocDate,
@@ -113,6 +113,20 @@ namespace AspNetAngular.Controllers
                     T1.ItemCode";
             var sqgrResult = await _context.SQGRDifference.FromSql(sqgrDifference, docentry).ToListAsync();
             return sqgrResult;
+        }
+
+        [HttpGet("getITRNos")]
+        public async Task<ActionResult<IEnumerable<ITRNos>>> getITRNos(int docnum)
+        {
+            var rawQuery = @"
+                select
+                    replace(a.Comments, 'ITR No. ', '') 'ITRNo'
+                from
+                    OQUT A
+                where
+					A.DocNum = {0}";
+            var itrNos = await _context.ITRNos.FromSql(rawQuery, docnum).ToListAsync();
+            return itrNos;
         }
     }
 }

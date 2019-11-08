@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ProductionForecast, ProductionForecastDetails, SQGRDifference } from '../../core/api.client';
+import { ProductionForecast, ProductionForecastDetails, SQGRDifference, ITRNos } from '../../core/api.client';
 import { IssueForProdDetails } from '../../core/api.client';
 import { RepCompletionDetails } from '../../core/api.client';
 import { ProdOrderDetails } from '../../core/api.client';
@@ -27,6 +27,8 @@ export class ForProductionComponent implements OnInit {
   goodsReceiptDetails: RepCompletionDetails[] = [];
 
   sumGoodsReceiptDetails: SQGRDifference[] = [];
+
+  itrNos: ITRNos[] = [];
 
   branch = '';
   branches: Branches[] = [];
@@ -100,8 +102,14 @@ export class ForProductionComponent implements OnInit {
   getBranches() {
     this.apiService.getBranchList().subscribe(response => {
       this.branches = response;
-      console.log(response);
     });
+  }
+
+  getITRNos(docNum: number) {
+    this.apiService.getITRNos(docNum).subscribe(response => {
+      this.itrNos = response;
+      console.log(response);
+    })
   }
 
   arraySplit(docNum: string) {

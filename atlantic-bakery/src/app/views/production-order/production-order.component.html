@@ -19,7 +19,7 @@
                     <table class="table table-hover table-sm">
                         <thead>
                             <tr>
-                                <th class="text-center" width="3%"><i class="fa fa-eye"></i></th>
+                                <!--<th class="text-center" width="3%"><i class="fa fa-eye"></i></th>-->
                                 <th class="text-center">Doc. Date</th>
                                 <th>From</th>
                                 <th>To</th>
@@ -27,23 +27,58 @@
                                 <th>Days Due</th>
                                 <th>IT No.</th>
                                 <th>Status</th>
-                                <th>Remarks</th>
+                                <th class="text-center">Remarks</th>
                                 <th>Pick</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr
-                                *ngFor="let o of productionOrder | slice: (page-1) * pageSize : (page-1) * pageSize + pageSize">
-                                <td class="text-center">
+                            <tr *ngFor="let o of productionOrder 
+                                | slice: (page-1) * pageSize : (page-1) * pageSize + pageSize">
+                                <!--<td class="text-center">
                                     <button type="button" class="btn btn-link btn-sm"
-                                        (click)="openModal(itrModal,o.docNum)">View</button>
-                                </td>
+                                        (click)="openModal(itrModal,o.itrNo)">View</button>
+                                </td>-->
                                 <td class="text-center"> {{ o.docDate | date: 'yyyy-MM-dd' }} </td>
-                                <td> {{ o.branchName}} </td>
+                                <td> {{ o.from }} </td>
+                                <td> {{ o.to }} </td>
                                 <td popover="Remarks: {{ o.docRemarks }}" triggers="mouseenter:mouseleave">
-                                    {{ o.docNum }} </td>
-                                <td> {{ o.status }} </td>
+                                    <button type="button" class="btn btn-link btn-sm"
+                                        (click)="openModal(itrModal, o.itrNo)"> {{ o.itrNo }} </button>
+                                </td>
                                 <td> {{ o.daysDue }} </td>
+                                <td>
+                                    <ng-template [ngIf]="o.itNo.includes(', ')" [ngIfElse]="testOne">
+                                        <div class="btn-group" dropdown>
+                                            <button dropdownToggle type="button"
+                                                class="btn btn-link btn-sm dropdown-toggle">
+                                                View <span class="caret"></span>
+                                            </button>
+                                            <ul *dropdownMenu class="dropdown-menu" role="menu">
+                                                <li role="menuitem" *ngFor="let i of arraySplit(o.itNo)">
+                                                    <a class="dropdown-item" (click)="itDetails(itModal, i)"> {{ i }}
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </ng-template>
+                                    <ng-template #testOne>
+                                        <button type="button" class="btn btn-link btn-sm"
+                                            (click)="itDetails(itModal, o.itNo)"> {{ o.itNo }} </button>
+                                    </ng-template>
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-link btn-sm"
+                                        (click)="itritComparison(itritModal, o.itrNo)"> {{ o.status }} </button>
+                                </td>
+                                <td class="text-center">
+                                    <button type="button" (click)="openModalListRemarks(remarksNotes,o.docNum)"><i
+                                            class="fa fa-pencil-square-o fa-lg"></i></button>
+                                </td>
+                                <td>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox">
+                                    </div>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -57,7 +92,7 @@
 </div>
 <ng-template #itrModal let-modal>
     <div class="modal-header">
-        <h4 class="modal-title" id="modal-basic-title">Production Order (ITR)</h4>
+        <h4 class="modal-title" id="modal-basic-title">Inventory Transfer Request</h4>
         <button type="button" class="close" aria-label="close" (click)="closeModal()">
             <span aria-hidden="true">&times;</span>
         </button>
@@ -72,7 +107,7 @@
                             <th>Item Code</th>
                             <th>Description</th>
                             <th>ITR Quantity</th>
-                            <th>IT Quantity</th>
+                            <!--<th>IT Quantity</th>-->
                         </tr>
                     </thead>
                     <tbody>
@@ -80,10 +115,131 @@
                             <td> {{ o.itemCode }} </td>
                             <td> {{ o.description }} </td>
                             <td> {{ o.quantity }} </td>
-                            <td> {{ o.itQuantity }} </td>
+                            <!--<td> {{ o.itQuantity }} </td>-->
                         </tr>
                     </tbody>
                 </table>
+            </div>
+        </div>
+    </div>
+</ng-template>
+<ng-template #itModal let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title" id="modal-basic-title">Inventory Transfer</h4>
+        <button type="button" class="close" aria-label="close" (click)="closeModal()">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <strong>Item Details (IT No. {{ itNo }} )</strong>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover table-sm">
+                    <thead>
+                        <tr>
+                            <th>Item Code</th>
+                            <th>Description</th>
+                            <th>Quantity</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let o of invTransferDetails">
+                            <td> {{ o.itemCode }} </td>
+                            <td> {{ o.dscription }} </td>
+                            <td> {{ o.quantity }} </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</ng-template>
+<ng-template #itritModal let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title" id="modal-basic-title">ITR IT Difference</h4>
+        <button type="button" class="close" aria-label="close" (click)="closeModal()">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <strong>Item Details</strong>
+        <div class="card-body">
+            <div style="overflow-y: auto; height: 300px;">
+                <table class="table table-hover table-sm">
+                    <thead>
+                        <tr>
+                            <th>Item Code</th>
+                            <th>Description</th>
+                            <th>ITR Quantity</th>
+                            <th>IT Quantity</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let i of itritDifference"
+                            [ngClass]="i.itrQuantity > i.itQuantity || i.itQuantity > i.itrQuantity ? 'table-warning' : '' ">
+                            <td> {{ i.itemCode }} </td>
+                            <td> {{ i.dscription }} </td>
+                            <td> {{ i.itrQuantity }} </td>
+                            <td> {{ i.itQuantity }} </td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td><span class="text-danger"> {{ itrTotalQuantity }} </span></td>
+                            <td><span class="text-danger"> {{ itTotalQuantity }} </span></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #createRemarks let-modal let-closeCreateRemarks="dismiss">
+    <div class="modal-body">
+        <button type="button" class="close" aria-label="Close" (click)="closeModalRemarks()">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        <div class="form-group">
+            <label><strong>Remarks</strong></label>
+            <textarea class="form-control" rows="5"></textarea>
+        </div>
+        <div class="d-flex flex-row-reverse">
+            <button type="button" class="btn btn-primary">Save</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #remarksNotes let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title" id="modal-basic-title"><i class="fa fa-user"></i> ITR Number ({{ itrNo }})</h4>
+        <button type="button" class="close" aria-label="Close" (click)="closeModal()">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <div class="card">
+            <div class="card-body">
+                <button type="button" class="btn btn-primary btn-sm" style="margin-bottom: 3px;"
+                    (click)="openModalRemarks(createRemarks)"><i class="fa fa-pencil-square-o"></i> Write</button>
+                <div class="table-responsive">
+                    <table class="table table-hover table-sm">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Remarks</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- <tr *ngFor="let o of remarks">
+                                <td>{{ o.logDate | date: 'yyyy-MM-dd' }}</td>
+                                <td>{{ o.remarks }}</td>
+                            </tr> -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>

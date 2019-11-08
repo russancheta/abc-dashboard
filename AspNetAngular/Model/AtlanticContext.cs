@@ -17,6 +17,8 @@ namespace AspNetAngular.Model
 
         public virtual DbQuery<ProductionOrder> ProductionOrder { get; set; }
         public virtual DbQuery<ProdOrderDetails> ProdOrderDetails { get; set; }
+        public virtual DbQuery<InvTransferDetails> InvTransferDetails { get; set; }
+        public virtual DbQuery<ITRITDifference> ITRITDifference { get; set; }
         public virtual DbQuery<IssueForProduction> IssueForProduction { get; set; }
         public virtual DbQuery<IssueForProdDetails> IssueForProdDetails { get; set; }
         public virtual DbQuery<ReportCompletion> ReportCompletion { get; set; }
@@ -26,6 +28,7 @@ namespace AspNetAngular.Model
         public virtual DbQuery<SQGRDifference> SQGRDifference { get; set; }
         public virtual DbQuery<JobOrder> JobOrder { get; set; }
         public virtual DbQuery<JobOrderDetails> JobOrderDetails { get; set; }
+        public virtual DbQuery<ITRNos> ITRNos { get; set; }
         public virtual DbQuery<Branches> Branches { get; set;}
     }
 }

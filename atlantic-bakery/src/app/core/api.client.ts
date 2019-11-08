@@ -501,6 +501,66 @@ export class Service {
     }
 
     /**
+     * @param docnum (optional) 
+     * @return Success
+     */
+    getITRNos(docnum: number | undefined): Observable<ITRNos[]> {
+        let url_ = this.baseUrl + "/api/controllers/getITRNos?";
+        if (docnum === null)
+            throw new Error("The parameter 'docnum' cannot be null.");
+        else if (docnum !== undefined)
+            url_ += "docnum=" + encodeURIComponent("" + docnum) + "&"; 
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetITRNos(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetITRNos(<any>response_);
+                } catch (e) {
+                    return <Observable<ITRNos[]>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<ITRNos[]>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetITRNos(response: HttpResponseBase): Observable<ITRNos[]> {
+        const status = response.status;
+        const responseBlob = 
+            response instanceof HttpResponse ? response.body : 
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200.push(ITRNos.fromJS(item));
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<ITRNos[]>(<any>null);
+    }
+
+    /**
      * @param branch (optional) 
      * @return Success
      */
@@ -618,6 +678,126 @@ export class Service {
             }));
         }
         return _observableOf<ProdOrderDetails[]>(<any>null);
+    }
+
+    /**
+     * @param docnum (optional) 
+     * @return Success
+     */
+    getITDetails(docnum: number | undefined): Observable<InvTransferDetails[]> {
+        let url_ = this.baseUrl + "/api/controllers/getITDetails?";
+        if (docnum === null)
+            throw new Error("The parameter 'docnum' cannot be null.");
+        else if (docnum !== undefined)
+            url_ += "docnum=" + encodeURIComponent("" + docnum) + "&"; 
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetITDetails(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetITDetails(<any>response_);
+                } catch (e) {
+                    return <Observable<InvTransferDetails[]>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<InvTransferDetails[]>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetITDetails(response: HttpResponseBase): Observable<InvTransferDetails[]> {
+        const status = response.status;
+        const responseBlob = 
+            response instanceof HttpResponse ? response.body : 
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200.push(InvTransferDetails.fromJS(item));
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<InvTransferDetails[]>(<any>null);
+    }
+
+    /**
+     * @param docnum (optional) 
+     * @return Success
+     */
+    getDifference(docnum: number | undefined): Observable<ITRITDifference[]> {
+        let url_ = this.baseUrl + "/api/controllers/getDifference?";
+        if (docnum === null)
+            throw new Error("The parameter 'docnum' cannot be null.");
+        else if (docnum !== undefined)
+            url_ += "docnum=" + encodeURIComponent("" + docnum) + "&"; 
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetDifference(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetDifference(<any>response_);
+                } catch (e) {
+                    return <Observable<ITRITDifference[]>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<ITRITDifference[]>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetDifference(response: HttpResponseBase): Observable<ITRITDifference[]> {
+        const status = response.status;
+        const responseBlob = 
+            response instanceof HttpResponse ? response.body : 
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200.push(ITRITDifference.fromJS(item));
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<ITRITDifference[]>(<any>null);
     }
 
     /**
@@ -1181,14 +1361,50 @@ export interface ISQGRDifference {
     grQuantity?: number;
 }
 
+export class ITRNos implements IITRNos {
+    itrNo?: string;
+
+    constructor(data?: IITRNos) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            this.itrNo = data["itrNo"];
+        }
+    }
+
+    static fromJS(data: any): ITRNos {
+        data = typeof data === 'object' ? data : {};
+        let result = new ITRNos();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["itrNo"] = this.itrNo;
+        return data; 
+    }
+}
+
+export interface IITRNos {
+    itrNo?: string;
+}
+
 export class ProductionOrder implements IProductionOrder {
-    docStatus?: string;
-    docNum?: number;
-    branchName?: string;
     docDate?: Date;
-    status?: string;
+    from?: string;
+    to?: string;
+    itrNo?: number;
     daysDue?: number;
-    prodForecastNo?: string;
+    itNo?: string;
+    status?: string;
     docRemarks?: string;
 
     constructor(data?: IProductionOrder) {
@@ -1202,13 +1418,13 @@ export class ProductionOrder implements IProductionOrder {
 
     init(data?: any) {
         if (data) {
-            this.docStatus = data["docStatus"];
-            this.docNum = data["docNum"];
-            this.branchName = data["branchName"];
             this.docDate = data["docDate"] ? new Date(data["docDate"].toString()) : <any>undefined;
-            this.status = data["status"];
+            this.from = data["from"];
+            this.to = data["to"];
+            this.itrNo = data["itrNo"];
             this.daysDue = data["daysDue"];
-            this.prodForecastNo = data["prodForecastNo"];
+            this.itNo = data["itNo"];
+            this.status = data["status"];
             this.docRemarks = data["docRemarks"];
         }
     }
@@ -1222,26 +1438,26 @@ export class ProductionOrder implements IProductionOrder {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["docStatus"] = this.docStatus;
-        data["docNum"] = this.docNum;
-        data["branchName"] = this.branchName;
         data["docDate"] = this.docDate ? this.docDate.toISOString() : <any>undefined;
-        data["status"] = this.status;
+        data["from"] = this.from;
+        data["to"] = this.to;
+        data["itrNo"] = this.itrNo;
         data["daysDue"] = this.daysDue;
-        data["prodForecastNo"] = this.prodForecastNo;
+        data["itNo"] = this.itNo;
+        data["status"] = this.status;
         data["docRemarks"] = this.docRemarks;
         return data; 
     }
 }
 
 export interface IProductionOrder {
-    docStatus?: string;
-    docNum?: number;
-    branchName?: string;
     docDate?: Date;
-    status?: string;
+    from?: string;
+    to?: string;
+    itrNo?: number;
     daysDue?: number;
-    prodForecastNo?: string;
+    itNo?: string;
+    status?: string;
     docRemarks?: string;
 }
 
@@ -1290,6 +1506,98 @@ export interface IProdOrderDetails {
     itemCode?: string;
     description?: string;
     quantity?: number;
+    itQuantity?: number;
+}
+
+export class InvTransferDetails implements IInvTransferDetails {
+    itemCode?: string;
+    dscription?: string;
+    quantity?: number;
+
+    constructor(data?: IInvTransferDetails) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            this.itemCode = data["itemCode"];
+            this.dscription = data["dscription"];
+            this.quantity = data["quantity"];
+        }
+    }
+
+    static fromJS(data: any): InvTransferDetails {
+        data = typeof data === 'object' ? data : {};
+        let result = new InvTransferDetails();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["itemCode"] = this.itemCode;
+        data["dscription"] = this.dscription;
+        data["quantity"] = this.quantity;
+        return data; 
+    }
+}
+
+export interface IInvTransferDetails {
+    itemCode?: string;
+    dscription?: string;
+    quantity?: number;
+}
+
+export class ITRITDifference implements IITRITDifference {
+    itemCode?: string;
+    dscription?: string;
+    itrQuantity?: number;
+    itQuantity?: number;
+
+    constructor(data?: IITRITDifference) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            this.itemCode = data["itemCode"];
+            this.dscription = data["dscription"];
+            this.itrQuantity = data["itrQuantity"];
+            this.itQuantity = data["itQuantity"];
+        }
+    }
+
+    static fromJS(data: any): ITRITDifference {
+        data = typeof data === 'object' ? data : {};
+        let result = new ITRITDifference();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["itemCode"] = this.itemCode;
+        data["dscription"] = this.dscription;
+        data["itrQuantity"] = this.itrQuantity;
+        data["itQuantity"] = this.itQuantity;
+        return data; 
+    }
+}
+
+export interface IITRITDifference {
+    itemCode?: string;
+    dscription?: string;
+    itrQuantity?: number;
     itQuantity?: number;
 }
 
