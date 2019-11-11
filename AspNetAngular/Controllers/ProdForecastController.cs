@@ -15,9 +15,11 @@ namespace AspNetAngular.Controllers
     public class ProdForecast : ControllerBase
     {
         private readonly AtlanticContext _context;
+        private readonly AuthDbContext _authDbContext;
 
-        public ProdForecast(AtlanticContext context)
+        public ProdForecast(AtlanticContext context, AuthDbContext authDbContext)
         {
+            _authDbContext = authDbContext;
             _context = context;
         }
 
@@ -150,6 +152,31 @@ namespace AspNetAngular.Controllers
 					A.DocNum = {0}";
             var itrNos = await _context.ITRNos.FromSql(rawQuery, docnum).ToListAsync();
             return itrNos;
+        }
+
+        [HttpPost("insertremarks")]
+        public async Task<ActionResult<ResultReponser>> sqInsertRemarks(Pmremarks model)
+        {
+            _authDbContext.Pmremarks.Add(model);
+            var insert = await _authDbContext.SaveChangesAsync();
+            if (insert > 0)
+            {
+                return new ResultReponser
+                {
+                    Result = "success",
+                    Message = "Insert Remarks..",
+                    ResponseData = insert
+                };
+            }
+            else
+            {
+                return new ResultReponser
+                {
+                    Result = "failed",
+                    Message = "Failed to insert remarks.",
+                    ResponseData = insert
+                };
+            }
         }
     }
 }

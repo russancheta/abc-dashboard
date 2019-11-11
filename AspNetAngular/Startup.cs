@@ -36,6 +36,11 @@ namespace AspNetAngular
             services.AddDbContext<AtlanticContext>(options => 
                 options.UseSqlServer(
                     Configuration.GetConnectionString("SQLConnection")));
+
+            services.AddDbContext<AuthDbContext>(options => 
+                options.UseSqlServer(
+                    Configuration.GetConnectionString("RPODB")));
+            
             
             // services.AddDbContext<Auth
 
