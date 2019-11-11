@@ -67,6 +67,10 @@ export class ForProductionComponent implements OnInit {
     // this.getProdForecast(this.branches[0].name);
   }
 
+  getITRCompareSQ(itrNo: string) {
+    this.apiService.getITCompareSQ(itrNo).subscribe(res => { this.itrs = res; });
+  }
+
   getProdForecast(branch: string) {
     this.showLoading();
     this.branch = branch;
@@ -135,6 +139,7 @@ export class ForProductionComponent implements OnInit {
     console.log(itrNo);
     this.itrNo = itrNo;
     this.getProdForecastDetails(sqNo);
+    this.getITRCompareSQ(itrNo);
     this.modalRef = this.modalService.show(content, { backdrop: 'static', class: 'modal-xl' });
     this.sqNo = sqNo.toString();
   }
