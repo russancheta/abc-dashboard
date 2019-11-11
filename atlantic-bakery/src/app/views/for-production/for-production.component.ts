@@ -21,6 +21,7 @@ export class ForProductionComponent implements OnInit {
 
   productionForecast: ProductionForecast[] = [];
   productionForecastDetails: ProductionForecastDetails[] = [];
+  itrs: ProductionForecastDetails[] = [];
 
   goodsIssueDetails: IssueForProdDetails[] = [];
 
@@ -53,6 +54,8 @@ export class ForProductionComponent implements OnInit {
   grQuantityTotal: number = 0;
 
   // Remarks Declaration
+
+  // SQ DETAILS
 
   constructor(
     private apiService: Service,
@@ -109,7 +112,7 @@ export class ForProductionComponent implements OnInit {
     this.apiService.getITRNos(docNum).subscribe(response => {
       this.itrNos = response;
       console.log(response);
-    })
+    });
   }
 
   arraySplit(docNum: string) {
@@ -128,7 +131,9 @@ export class ForProductionComponent implements OnInit {
     this.itrNo = itrNo.toString();
   }
 
-  soDetails(content: any, sqNo: number) {
+  soDetails(content: any, sqNo: number, itrNo: string) {
+    console.log(itrNo);
+    this.itrNo = itrNo;
     this.getProdForecastDetails(sqNo);
     this.modalRef = this.modalService.show(content, { backdrop: 'static', class: 'modal-xl' });
     this.sqNo = sqNo.toString();

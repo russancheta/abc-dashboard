@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using AspNetAngular.Model;
+using System.Data.SqlClient;
 
 namespace AspNetAngular.Controllers
 {
@@ -75,9 +76,7 @@ namespace AspNetAngular.Controllers
                 select
                     b.ItemCode,
                     b.Dscription 'Description',
-                    b.Quantity,
-                    b.PriceAfVAT,
-                    b.LineTotal
+                    b.Quantity
                 from
                     OQUT a
                     inner join QUT1 b on a.DocEntry = b.DocEntry
@@ -87,6 +86,26 @@ namespace AspNetAngular.Controllers
                     b.ItemCode";
             var forecastDetails = await _context.ProductionForecastDetails.FromSql(prodForecastDetails, docnum).ToListAsync();
             return forecastDetails;
+        }
+
+        [HttpGet("getITCompareSQ")]
+        public async Task<ActionResult<IEnumerable<ProductionForecastDetails>>> getITCompareSQ(string itrNo)
+        {
+            string rawQuery = @"
+                DECLARE @SQL VARCHAR(MAX)
+                DECLARE @ITRNO nvarchar(254)
+                SET @ITRNO = @itr
+                SET @SQL = 'SELECT 
+                b.ItemCode,
+                b.Dscription [Description],
+                sum(b.quantity) [Quantity]
+                FROM OWTQ a INNER JOIN
+                WTQ1 b on b.DocEntry = a.DocEntry
+                WHERE a.DocNum IN ('+@ITRNO+')
+                GROUP By b.ItemCode,b.Dscription'
+                EXEC (@SQL)";
+            var details = await _context.ProductionForecastDetails.FromSql(rawQuery, new SqlParameter("itr", itrNo)).ToListAsync();
+            return details;
         }
 
         [HttpGet("sqgrDifference")]
