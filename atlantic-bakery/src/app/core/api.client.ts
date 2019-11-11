@@ -441,6 +441,66 @@ export class Service {
     }
 
     /**
+     * @param itrNo (optional) 
+     * @return Success
+     */
+    getITCompareSQ(itrNo: string | undefined): Observable<ProductionForecastDetails[]> {
+        let url_ = this.baseUrl + "/api/controllers/getITCompareSQ?";
+        if (itrNo === null)
+            throw new Error("The parameter 'itrNo' cannot be null.");
+        else if (itrNo !== undefined)
+            url_ += "itrNo=" + encodeURIComponent("" + itrNo) + "&"; 
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetITCompareSQ(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetITCompareSQ(<any>response_);
+                } catch (e) {
+                    return <Observable<ProductionForecastDetails[]>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<ProductionForecastDetails[]>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetITCompareSQ(response: HttpResponseBase): Observable<ProductionForecastDetails[]> {
+        const status = response.status;
+        const responseBlob = 
+            response instanceof HttpResponse ? response.body : 
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200.push(ProductionForecastDetails.fromJS(item));
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<ProductionForecastDetails[]>(<any>null);
+    }
+
+    /**
      * @param docentry (optional) 
      * @return Success
      */
@@ -1265,8 +1325,6 @@ export class ProductionForecastDetails implements IProductionForecastDetails {
     itemCode?: string;
     description?: string;
     quantity?: number;
-    priceAfVAT?: number;
-    lineTotal?: number;
 
     constructor(data?: IProductionForecastDetails) {
         if (data) {
@@ -1282,8 +1340,6 @@ export class ProductionForecastDetails implements IProductionForecastDetails {
             this.itemCode = data["itemCode"];
             this.description = data["description"];
             this.quantity = data["quantity"];
-            this.priceAfVAT = data["priceAfVAT"];
-            this.lineTotal = data["lineTotal"];
         }
     }
 
@@ -1299,8 +1355,6 @@ export class ProductionForecastDetails implements IProductionForecastDetails {
         data["itemCode"] = this.itemCode;
         data["description"] = this.description;
         data["quantity"] = this.quantity;
-        data["priceAfVAT"] = this.priceAfVAT;
-        data["lineTotal"] = this.lineTotal;
         return data; 
     }
 }
@@ -1309,8 +1363,6 @@ export interface IProductionForecastDetails {
     itemCode?: string;
     description?: string;
     quantity?: number;
-    priceAfVAT?: number;
-    lineTotal?: number;
 }
 
 export class SQGRDifference implements ISQGRDifference {
