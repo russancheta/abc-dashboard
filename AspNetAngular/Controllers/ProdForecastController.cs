@@ -28,14 +28,19 @@ namespace AspNetAngular.Controllers
 					replace(a.Comments, 'ITR No. ', '') 'ITRNo',
                     A.DocDate,
                     A.DocNum,
-					(select datediff(d, z.DocDate, GETDATE()) from OQUT z where z.DocEntry = A.DocEntry and z.DocStatus = 'O') 'DaysDue',
+                    case
+						when sum(B.Quantity) = sum(E.Quantity) or sum(E.Quantity) = sum(B.Quantity) or sum(E.Quantity) > sum(B.Quantity)
+						then datediff(d, A.DocDate, max(C.DocDate))
+						when sum(B.Quantity) > sum(E.Quantity) or isnull(sum(E.Quantity),0) = 0
+						then DATEDIFF(d, A.DocDate, getdate())
+					end 'DaysDue',
 					cast(A.U_GIDocNum as varchar(50)) 'GoodsIssueNo',
 					isnull((STUFF(( SELECT distinct ', ' + cast(z.DocNum as nvarchar(50))
 					FROM OIGN z WHERE z.U_FCDocNum = a.DocNum FOR XML PATH('')),1,2,'')), '') 'GRDocNum',
 					case
 						when sum(B.Quantity) = sum(E.Quantity) or sum(E.Quantity) = sum(B.Quantity)
 						then 'Fully Served'
-						when sum(B.Quantity) > sum(E.Quantity)
+						when sum(E.Quantity) < sum(B.Quantity)
 						then 'Partially Served'
 						when sum(E.Quantity) > sum(B.Quantity)
 						then 'Over'
@@ -93,24 +98,23 @@ namespace AspNetAngular.Controllers
         public async Task<ActionResult<IEnumerable<SQGRDifference>>> getSQGRDifference(int docentry)
         {
             var sqgrDifference = @"
-				SELECT 
-                    T1.ItemCode, 
-                    T1.Dscription, 
-					isnull(T3.Quantity,0) 'SQQuantity',
-                    sum(isnull(T1.Quantity,0)) 'GRQuantity'
-                FROM 
-                    OIGN T0 
-                    INNER JOIN IGN1 T1 ON T0.DocEntry = T1.DocEntry
-					LEFT JOIN OQUT T2 ON T0.U_FCDocEntry = T2.DocEntry
-					LEFT JOIN QUT1 T3 ON T2.DocEntry = T3.DocEntry and t1.ItemCode = t3.ItemCode
-                WHERE 
-                    T0.U_FCDocEntry = {0}
-                GROUP BY 
-					T1.ItemCode, 
+				SELECT
+					T1.ItemCode,
                     T1.Dscription,
-					T3.Quantity
-                ORDER BY
-                    T1.ItemCode";
+					isnull(T1.Quantity,0) 'SQQuantity',
+					isnull(T2.Quantity,0) 'GRQuantity'
+                FROM 
+                    OQUT T0
+					inner join QUT1 T1 ON T0.DocEntry = T1.DocEntry
+					full outer join (select
+										z.U_FCDocEntry,
+										z1.ItemCode,
+										z1.Quantity
+									from
+										OIGN z
+										inner join IGN1 z1 on z.DocEntry = z1.DocEntry) T2 on T0.DocEntry = T2.U_FCDocEntry and T1.ItemCode = T2.ItemCode
+                WHERE 
+                    T0.DocEntry = {0}";
             var sqgrResult = await _context.SQGRDifference.FromSql(sqgrDifference, docentry).ToListAsync();
             return sqgrResult;
         }

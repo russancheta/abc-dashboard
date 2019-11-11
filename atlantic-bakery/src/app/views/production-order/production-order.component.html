@@ -2,12 +2,26 @@
     <div class="row">
         <div class="col-md-4">
             <div class="form-group">
-                <label>Choose Branch</label>
+                <label>Branch</label>
                 <select class="form-control" (change)="onChangeBranch($event.target.value)">
                     <option *ngFor="let b of branches">
                         {{ b.name }}
                     </option>
                 </select>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <div class="form-group">
+                    <label>Group</label>
+                    <select class="form-control">
+                        <option value="">All</option>
+                        <option value="Finished Goods">Finished Goods</option>
+                        <option value="Raw Materials">Raw Materials</option>
+                        <option value="Intermediate">Intermediate</option>
+                        <option value="Packaging & Other Materials">Packaging & Other Materials</option>
+                    </select>
+                </div>
             </div>
         </div>
     </div>

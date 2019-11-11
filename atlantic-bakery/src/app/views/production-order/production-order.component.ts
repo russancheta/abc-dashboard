@@ -29,7 +29,7 @@ export class ProductionOrderComponent implements OnInit {
 
   //paging
   page = 1;
-  pageSize = 50;
+  pageSize = 10;
 
   //comparison total modal
   itrTotalQuantity: number = 0;
