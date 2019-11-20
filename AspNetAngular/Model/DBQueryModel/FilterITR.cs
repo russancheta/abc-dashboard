@@ -2,7 +2,7 @@ using System;
 
 namespace AspNetAngular.Model
 {
-    public partial class ProductionOrder
+    public partial class FilterITR
     {
         public DateTime DocDate { get; set; }
         public string From  { get; set; }

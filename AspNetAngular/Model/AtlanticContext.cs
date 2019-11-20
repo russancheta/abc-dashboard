@@ -30,5 +30,6 @@ namespace AspNetAngular.Model
         public virtual DbQuery<JobOrderDetails> JobOrderDetails { get; set; }
         public virtual DbQuery<ITRNos> ITRNos { get; set; }
         public virtual DbQuery<Branches> Branches { get; set;}
+        public virtual DbQuery<FilterITR> FilterITR { get; set; }
     }
 }

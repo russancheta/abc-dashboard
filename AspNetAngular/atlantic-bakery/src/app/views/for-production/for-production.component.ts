@@ -57,6 +57,10 @@ export class ForProductionComponent implements OnInit {
 
   // SQ DETAILS
 
+  // checked sq for updating
+  selectedSQ = new Array();
+  checkSelected = 0;
+
   constructor(
     private apiService: Service,
     private modalService: BsModalService
@@ -109,6 +113,7 @@ export class ForProductionComponent implements OnInit {
   getBranches() {
     this.apiService.getBranchList().subscribe(response => {
       this.branches = response;
+      this.getProdForecast(this.branches[0].name);
     });
   }
 
@@ -164,6 +169,51 @@ export class ForProductionComponent implements OnInit {
       console.table(response);
     });
     this.modalRef = this.modalService.show(content, { backdrop: 'static', class: 'modal-lg' })
+  }
+
+  checkedSQ(sqNo: number) {
+    //this.pollingData.unsubscribe();
+    if (this.selectedSQ.includes(sqNo)) {
+      const i = this.selectedSQ.indexOf(sqNo);
+      this.selectedSQ.splice(i, 1);
+      this.checkSelected = this.selectedSQ.length;
+    } else {
+      this.selectedSQ.push(sqNo);
+      this.checkSelected = this.selectedSQ.length;
+    }
+    if (this.checkSelected == 0) {
+      this.getProdForecast(this.branch);
+    }
+  }
+
+  closeSQ(sqNos: any) {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      type: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, close it!',
+      allowOutsideClick: false
+    }).then((result) => {
+      if (result.value) {
+        this.apiService.updateSQ(sqNos).subscribe(response => {
+          if (response.result == 'Success') {
+            Swal.fire(
+              'Closed',
+              '',
+              'success'
+            );
+            this.selectedSQ = new Array();
+            this.getProdForecast(this.branch);
+            console.log(this.selectedSQ);
+            console.log(response.result);
+            console.log(response.message);
+          }
+        });
+      }
+    });
   }
 
   closeModal() {

@@ -1,6 +1,7 @@
 <div class="animated fadeIn">
+    <h5>ITR/IT Monitoring</h5>
     <div class="row">
-        <div class="col-md-4">
+        <div class="col-md-2">
             <div class="form-group">
                 <label>Branch</label>
                 <select class="form-control" (change)="onChangeBranch($event.target.value)">
@@ -10,16 +11,38 @@
                 </select>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-2">
             <div class="form-group">
                 <div class="form-group">
                     <label>Group</label>
-                    <select class="form-control">
-                        <option value="">All</option>
-                        <option value="Finished Goods">Finished Goods</option>
-                        <option value="Raw Materials">Raw Materials</option>
-                        <option value="Intermediate">Intermediate</option>
-                        <option value="Packaging & Other Materials">Packaging & Other Materials</option>
+                    <select class="form-control" (change)="filterGroup($event.target.value)">
+                        <option *ngFor="let o of filterOption" [value]="o.value">{{ o.label }}</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                <div class="form-group">
+                    <label>From</label>
+                    <select class="form-control" (change)="filterFrom($event.target.value)">
+                        <option value="All">All</option>
+                        <option *ngFor="let b of branches">
+                            {{ b.name }}
+                        </option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                <div class="form-group">
+                    <label>To</label>
+                    <select class="form-control" (change)="filterTo($event.target.value)">
+                        <option value="All">All</option>
+                        <option *ngFor="let b of branches">
+                            {{ b.name }}
+                        </option>
                     </select>
                 </div>
             </div>
@@ -27,9 +50,15 @@
     </div>
     <ngb-tabset>
         <ngb-tab>
-            <ng-template ngbTabTitle>Production Order <span class="badge badge-primary"></span></ng-template>
+            <ng-template ngbTabTitle>Production Order <span class="badge badge-primary"> {{ returnPO.length }}
+                </span></ng-template>
             <ng-template ngbTabContent>
                 <div class="table-responsive">
+                    <div class="d-flex flex-row-reverse" *ngIf="selectedITR.length > 0">
+                        <p>Selected: <strong> {{ selectedITR.length }} - </strong> <button type="button"
+                                class="btn btn-primary btn-sm" (click)="closeITR(selectedITR)">Close</button>
+                        </p>
+                    </div>
                     <table class="table table-hover table-sm">
                         <thead>
                             <tr>
@@ -46,7 +75,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr *ngFor="let o of productionOrder 
+                            <tr *ngFor="let o of returnPO 
                                 | slice: (page-1) * pageSize : (page-1) * pageSize + pageSize">
                                 <!--<td class="text-center">
                                     <button type="button" class="btn btn-link btn-sm"
@@ -85,18 +114,18 @@
                                         (click)="itritComparison(itritModal, o.itrNo)"> {{ o.status }} </button>
                                 </td>
                                 <td class="text-center">
-                                    <button type="button" (click)="openModalListRemarks(remarksNotes,o.docNum)"><i
+                                    <button type="button" (click)="openModalListRemarks(remarksNotes,o.itrNo)"><i
                                             class="fa fa-pencil-square-o fa-lg"></i></button>
                                 </td>
                                 <td>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox">
+                                        <input class="form-check-input" type="checkbox" (change)="checkedITR(o.itrNo)">
                                     </div>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
-                    <ngb-pagination [(page)]="page" [pageSize]="pageSize" [collectionSize]="productionOrder.length"
+                    <ngb-pagination [(page)]="page" [pageSize]="pageSize" [collectionSize]="returnPO.length"
                         [boundaryLinks]="true" [maxSize]="10">
                     </ngb-pagination>
                 </div>

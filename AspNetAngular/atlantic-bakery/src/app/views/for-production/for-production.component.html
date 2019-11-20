@@ -1,8 +1,9 @@
 <div class="animated fadeIn">
+    <h5>Production Order Monitoring</h5>
     <div class="row">
         <div class="col-md-4">
             <div class="form-group">
-                <label>Choose Branch</label>
+                <label>Branch</label>
                 <select class="form-control" (change)="onChangeBranch($event.target.value)">
                     <option *ngFor="let b of branches">
                         {{ b.name }}
@@ -13,31 +14,38 @@
     </div>
     <ngb-tabset>
         <ngb-tab>
-            <ng-template ngbTabTitle>Production Forecast<span class="badge badge-primary"></span></ng-template>
+            <ng-template ngbTabTitle>Production Forecast <span class="badge badge-primary">
+                    {{ productionForecast.length }} </span></ng-template>
             <ng-template ngbTabContent>
-                <table class="table table-hover table-sm">
-                    <thead>
-                        <tr>
-                            <th>Doc. Date</th>
-                            <th>SQ No.</th>
-                            <th>Days Due</th>
-                            <th>GI No.</th>
-                            <th>GR No.</th>
-                            <th>Status</th>
-                            <th class="text-center">Remarks</th>
-                            <th>Pick</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr
-                            *ngFor="let o of productionForecast | slice: (page-1) * pageSize : (page-1) * pageSize + pageSize">
-                            <td> {{ o.docDate | date: 'yyyy-MM-dd' }} </td>
-                            <td>
-                                <button style="color: #2980b9" type="button" class="btn btn-link btn-sm"
-                                    (click)="soDetails(sqModal, o.docNum, o.itrNo)"> {{ o.docNum }}</button>
-                            </td>
-                            <td> {{ o.daysDue }} </td>
-                            <!-- <td>
+                <div class="table-responsive">
+                    <div class="d-flex flex-row-reverse" *ngIf="selectedSQ.length > 0">
+                        <p>Selected: <strong> {{ selectedSQ.length }} - </strong> <button type="button"
+                            class="btn btn-primary btn-sm" (click)="closeSQ(selectedSQ)">Close</button>
+                        </p>
+                    </div>
+                    <table class="table table-hover table-sm">
+                        <thead>
+                            <tr>
+                                <th>Doc. Date</th>
+                                <th>SQ No.</th>
+                                <th>Days Due</th>
+                                <th>GI No.</th>
+                                <th>GR No.</th>
+                                <th>Status</th>
+                                <th class="text-center">Remarks</th>
+                                <th>Pick</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr
+                                *ngFor="let o of productionForecast | slice: (page-1) * pageSize : (page-1) * pageSize + pageSize">
+                                <td> {{ o.docDate | date: 'yyyy-MM-dd' }} </td>
+                                <td popover="Remarks: {{ o.docRemarks }}" triggers="mouseenter:mouseleave">
+                                    <button style="color: #2980b9" type="button" class="btn btn-link btn-sm"
+                                        (click)="soDetails(sqModal, o.docNum, o.itrNo)"> {{ o.docNum }}</button>
+                                </td>
+                                <td> {{ o.daysDue }} </td>
+                                <!-- <td>
                                 <ng-template [ngIf]="o.itrNo.includes(', ')" [ngIfElse]="itrOne">
                                     <div class="btn-group" dropdown>
                                         <button dropdownToggle type="button"
@@ -55,48 +63,50 @@
                                     <button type="button" class="btn btn-sm btn-outline-info">{{ o.itrNo }}</button>
                                 </ng-template>
                             </td> -->
-                            <td>
-                                <button style="color: #c0392b;" type="button" class="btn btn-link btn-sm"
-                                    (click)="giDetails(giModal, o.goodsIssueNo)"> {{ o.goodsIssueNo }} </button>
-                            </td>
-                            <td>
-                                <ng-template [ngIf]="o.grDocNum.includes(', ')" [ngIfElse]="testOne">
-                                    <div class="btn-group" dropdown>
-                                        <button dropdownToggle type="button" style="color: green;"
-                                            class="btn btn-link btn-sm dropdown-toggle">
-                                            View <span class="caret"></span>
-                                        </button>
-                                        <ul *dropdownMenu class="dropdown-menu" role="menu">
-                                            <li role="menuitem" *ngFor="let i of arraySplit(o.grDocNum)">
-                                                <a class="dropdown-item" (click)="grDetails(grModal, i)"> {{ i }} </a>
-                                            </li>
-                                        </ul>
+                                <td>
+                                    <button style="color: #c0392b;" type="button" class="btn btn-link btn-sm"
+                                        (click)="giDetails(giModal, o.goodsIssueNo)"> {{ o.goodsIssueNo }} </button>
+                                </td>
+                                <td>
+                                    <ng-template [ngIf]="o.grDocNum.includes(', ')" [ngIfElse]="testOne">
+                                        <div class="btn-group" dropdown>
+                                            <button dropdownToggle type="button" style="color: green;"
+                                                class="btn btn-link btn-sm dropdown-toggle">
+                                                View <span class="caret"></span>
+                                            </button>
+                                            <ul *dropdownMenu class="dropdown-menu" role="menu">
+                                                <li role="menuitem" *ngFor="let i of arraySplit(o.grDocNum)">
+                                                    <a class="dropdown-item" (click)="grDetails(grModal, i)"> {{ i }}
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </ng-template>
+                                    <ng-template #testOne>
+                                        <button type="button" class="btn btn-link btn-sm" style="color: green;"
+                                            (click)="grDetails(grModal, o.grDocNum)"> {{ o.grDocNum }} </button>
+                                    </ng-template>
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-link btn-sm"
+                                        (click)="sqGrDifference(sqgrModal, o.docEntry)"> {{ o.status }} </button>
+                                </td>
+                                <td class="text-center">
+                                    <button type="button" (click)="openModalListRemarks(remarksNotes,o.docNum)"><i
+                                            class="fa fa-pencil-square-o fa-lg"></i></button>
+                                </td>
+                                <td>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" (change)="checkedSQ(o.docNum)">
                                     </div>
-                                </ng-template>
-                                <ng-template #testOne>
-                                    <button type="button" class="btn btn-link btn-sm" style="color: green;"
-                                        (click)="grDetails(grModal, o.grDocNum)"> {{ o.grDocNum }} </button>
-                                </ng-template>
-                            </td>
-                            <td>
-                                <button type="button" class="btn btn-link btn-sm"
-                                    (click)="sqGrDifference(sqgrModal, o.docEntry)"> {{ o.status }} </button>
-                            </td>
-                            <td class="text-center">
-                                <button type="button" (click)="openModalListRemarks(remarksNotes,o.docNum)"><i
-                                        class="fa fa-pencil-square-o fa-lg"></i></button>
-                            </td>
-                            <td>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox">
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-                <ngb-pagination [(page)]="page" [pageSize]="pageSize" [collectionSize]="productionForecast.length"
-                    [maxSize]="10">
-                </ngb-pagination>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <ngb-pagination [(page)]="page" [pageSize]="pageSize" [collectionSize]="productionForecast.length"
+                        [maxSize]="10">
+                    </ngb-pagination>
+                </div>
             </ng-template>
         </ngb-tab>
     </ngb-tabset>

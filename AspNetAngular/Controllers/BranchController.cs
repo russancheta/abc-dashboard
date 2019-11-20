@@ -27,8 +27,7 @@ namespace AspNetAngular.Controllers
                 from
 	                [@BOCODE] a
                 order by
-                    a.Name
-                                ";
+                    a.Name";
             var branchList = await _context.Branches.FromSql(branchListQuery).ToListAsync();
             return branchList;
         }

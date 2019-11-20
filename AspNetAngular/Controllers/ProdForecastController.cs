@@ -41,11 +41,11 @@ namespace AspNetAngular.Controllers
 					isnull((STUFF(( SELECT distinct ', ' + cast(z.DocNum as nvarchar(50))
 					FROM OIGN z WHERE z.U_FCDocNum = a.DocNum FOR XML PATH('')),1,2,'')), '') 'GRDocNum',
 					case
-						when sum(B.Quantity) = sum(E.Quantity) or sum(E.Quantity) = sum(B.Quantity)
+						when (select sum(isnull(z.Quantity,0)) from qut1 z where z.DocEntry = a.DocEntry) = sum(E.Quantity) or sum(E.Quantity) = (select sum(isnull(z.Quantity,0)) from qut1 z where z.DocEntry = a.DocEntry)
 						then 'Fully Served'
-						when sum(E.Quantity) < sum(B.Quantity)
+						when sum(E.Quantity) < (select sum(isnull(z.Quantity,0)) from qut1 z where z.DocEntry = a.DocEntry)
 						then 'Partially Served'
-						when sum(E.Quantity) > sum(B.Quantity)
+						when sum(E.Quantity) > (select sum(isnull(z.Quantity,0)) from qut1 z where z.DocEntry = a.DocEntry)
 						then 'Over'
 						when isnull(sum(E.Quantity),0) = 0
 						then 'Unserved'
@@ -57,10 +57,11 @@ namespace AspNetAngular.Controllers
 					inner join QUT1 B on A.DocEntry = B.DocEntry
                     left join [@BOCODE] D on A.U_BranchCode = D.Code
 					left join OIGN C on A.DocEntry = C.U_FCDocEntry
-					left join IGN1 E on C.DocEntry = E.DocEntry
+					left join IGN1 E on C.DocEntry = E.DocEntry and E.ItemCode = B.ItemCode
                 where
                     A.DocStatus = 'O'
                     and D.Name = {0}
+                    and A.U_SQPicked = 'No'
                     --and A.Comments like 'ITR N%'
 				group by
 					A.Comments,
@@ -155,9 +156,9 @@ namespace AspNetAngular.Controllers
         }
 
         [HttpPost("insertremarks")]
-        public async Task<ActionResult<ResultReponser>> sqInsertRemarks(Pmremarks model)
+        public async Task<ActionResult<ResultReponser>> sqInsertRemarks(PMRemarks model)
         {
-            _authDbContext.Pmremarks.Add(model);
+            _authDbContext.PMRemarks.Add(model);
             var insert = await _authDbContext.SaveChangesAsync();
             if (insert > 0)
             {
@@ -175,6 +176,35 @@ namespace AspNetAngular.Controllers
                     Result = "failed",
                     Message = "Failed to insert remarks.",
                     ResponseData = insert
+                };
+            }
+        }
+
+        [HttpPut("updateSQ")]
+        public async Task<ActionResult<ResultReponser>> pickedSQ(int[] sqNo)
+        {
+            var updateQuery = @"update a set a.U_SQPicked = 'Y' from OQUT a where a.DocNum = {0}";
+            int updateCount = 0;
+            foreach(int docNum in sqNo)
+            {
+                updateCount += await _context.Database.ExecuteSqlCommandAsync(updateQuery, docNum);
+            }
+            if (updateCount == sqNo.Length)
+            {
+                return new ResultReponser
+                {
+                    Result = "Success",
+                    Message = "All documents were updated",
+                    ResponseData = ""
+                };
+            }
+            else
+            {
+                return new ResultReponser
+                {
+                    Result = "Success",
+                    Message = "Not all documents were updated",
+                    ResponseData = ""
                 };
             }
         }

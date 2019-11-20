@@ -621,15 +621,132 @@ export class Service {
     }
 
     /**
-     * @param branch (optional) 
+     * @param body (optional) 
      * @return Success
      */
-    getProductionOrder(branch: string | undefined): Observable<ProductionOrder[]> {
+    insertremarks(body: Pmremarks | undefined): Observable<ResultReponser> {
+        let url_ = this.baseUrl + "/api/controllers/insertremarks";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json", 
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processInsertremarks(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processInsertremarks(<any>response_);
+                } catch (e) {
+                    return <Observable<ResultReponser>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<ResultReponser>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processInsertremarks(response: HttpResponseBase): Observable<ResultReponser> {
+        const status = response.status;
+        const responseBlob = 
+            response instanceof HttpResponse ? response.body : 
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ResultReponser.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<ResultReponser>(<any>null);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    updateSQ(body: number[] | undefined): Observable<ResultReponser> {
+        let url_ = this.baseUrl + "/api/controllers/updateSQ";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json", 
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processUpdateSQ(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processUpdateSQ(<any>response_);
+                } catch (e) {
+                    return <Observable<ResultReponser>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<ResultReponser>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processUpdateSQ(response: HttpResponseBase): Observable<ResultReponser> {
+        const status = response.status;
+        const responseBlob = 
+            response instanceof HttpResponse ? response.body : 
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ResultReponser.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<ResultReponser>(<any>null);
+    }
+
+    /**
+     * @param branch (optional) 
+     * @param group (optional) 
+     * @return Success
+     */
+    getProductionOrder(branch: string | undefined, group: string | undefined): Observable<ProductionOrder[]> {
         let url_ = this.baseUrl + "/api/controllers/getProductionOrder?";
         if (branch === null)
             throw new Error("The parameter 'branch' cannot be null.");
         else if (branch !== undefined)
             url_ += "branch=" + encodeURIComponent("" + branch) + "&"; 
+        if (group === null)
+            throw new Error("The parameter 'group' cannot be null.");
+        else if (group !== undefined)
+            url_ += "group=" + encodeURIComponent("" + group) + "&"; 
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -678,6 +795,66 @@ export class Service {
             }));
         }
         return _observableOf<ProductionOrder[]>(<any>null);
+    }
+
+    /**
+     * @param branch (optional) 
+     * @return Success
+     */
+    filterITR(branch: string | undefined): Observable<FilterITR[]> {
+        let url_ = this.baseUrl + "/api/controllers/filterITR?";
+        if (branch === null)
+            throw new Error("The parameter 'branch' cannot be null.");
+        else if (branch !== undefined)
+            url_ += "branch=" + encodeURIComponent("" + branch) + "&"; 
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processFilterITR(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processFilterITR(<any>response_);
+                } catch (e) {
+                    return <Observable<FilterITR[]>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<FilterITR[]>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processFilterITR(response: HttpResponseBase): Observable<FilterITR[]> {
+        const status = response.status;
+        const responseBlob = 
+            response instanceof HttpResponse ? response.body : 
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200.push(FilterITR.fromJS(item));
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<FilterITR[]>(<any>null);
     }
 
     /**
@@ -858,6 +1035,62 @@ export class Service {
             }));
         }
         return _observableOf<ITRITDifference[]>(<any>null);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    updateITR(body: number[] | undefined): Observable<ResultReponser> {
+        let url_ = this.baseUrl + "/api/controllers/updateITR";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json", 
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processUpdateITR(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processUpdateITR(<any>response_);
+                } catch (e) {
+                    return <Observable<ResultReponser>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<ResultReponser>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processUpdateITR(response: HttpResponseBase): Observable<ResultReponser> {
+        const status = response.status;
+        const responseBlob = 
+            response instanceof HttpResponse ? response.body : 
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ResultReponser.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<ResultReponser>(<any>null);
     }
 
     /**
@@ -1449,6 +1682,102 @@ export interface IITRNos {
     itrNo?: string;
 }
 
+export class Pmremarks implements IPmremarks {
+    id?: number;
+    logDate?: Date;
+    logName?: string;
+    remarks?: string;
+    sqno?: number;
+
+    constructor(data?: IPmremarks) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            this.id = data["id"];
+            this.logDate = data["logDate"] ? new Date(data["logDate"].toString()) : <any>undefined;
+            this.logName = data["logName"];
+            this.remarks = data["remarks"];
+            this.sqno = data["sqno"];
+        }
+    }
+
+    static fromJS(data: any): Pmremarks {
+        data = typeof data === 'object' ? data : {};
+        let result = new Pmremarks();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["logDate"] = this.logDate ? this.logDate.toISOString() : <any>undefined;
+        data["logName"] = this.logName;
+        data["remarks"] = this.remarks;
+        data["sqno"] = this.sqno;
+        return data; 
+    }
+}
+
+export interface IPmremarks {
+    id?: number;
+    logDate?: Date;
+    logName?: string;
+    remarks?: string;
+    sqno?: number;
+}
+
+export class ResultReponser implements IResultReponser {
+    result?: string;
+    message?: string;
+    responseData?: any;
+
+    constructor(data?: IResultReponser) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            this.result = data["result"];
+            this.message = data["message"];
+            this.responseData = data["responseData"];
+        }
+    }
+
+    static fromJS(data: any): ResultReponser {
+        data = typeof data === 'object' ? data : {};
+        let result = new ResultReponser();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["result"] = this.result;
+        data["message"] = this.message;
+        data["responseData"] = this.responseData;
+        return data; 
+    }
+}
+
+export interface IResultReponser {
+    result?: string;
+    message?: string;
+    responseData?: any;
+}
+
 export class ProductionOrder implements IProductionOrder {
     docDate?: Date;
     from?: string;
@@ -1458,6 +1787,7 @@ export class ProductionOrder implements IProductionOrder {
     itNo?: string;
     status?: string;
     docRemarks?: string;
+    group?: string;
 
     constructor(data?: IProductionOrder) {
         if (data) {
@@ -1478,6 +1808,7 @@ export class ProductionOrder implements IProductionOrder {
             this.itNo = data["itNo"];
             this.status = data["status"];
             this.docRemarks = data["docRemarks"];
+            this.group = data["group"];
         }
     }
 
@@ -1498,6 +1829,7 @@ export class ProductionOrder implements IProductionOrder {
         data["itNo"] = this.itNo;
         data["status"] = this.status;
         data["docRemarks"] = this.docRemarks;
+        data["group"] = this.group;
         return data; 
     }
 }
@@ -1511,6 +1843,75 @@ export interface IProductionOrder {
     itNo?: string;
     status?: string;
     docRemarks?: string;
+    group?: string;
+}
+
+export class FilterITR implements IFilterITR {
+    docDate?: Date;
+    from?: string;
+    to?: string;
+    itrNo?: number;
+    daysDue?: number;
+    itNo?: string;
+    status?: string;
+    docRemarks?: string;
+    group?: string;
+
+    constructor(data?: IFilterITR) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            this.docDate = data["docDate"] ? new Date(data["docDate"].toString()) : <any>undefined;
+            this.from = data["from"];
+            this.to = data["to"];
+            this.itrNo = data["itrNo"];
+            this.daysDue = data["daysDue"];
+            this.itNo = data["itNo"];
+            this.status = data["status"];
+            this.docRemarks = data["docRemarks"];
+            this.group = data["group"];
+        }
+    }
+
+    static fromJS(data: any): FilterITR {
+        data = typeof data === 'object' ? data : {};
+        let result = new FilterITR();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["docDate"] = this.docDate ? this.docDate.toISOString() : <any>undefined;
+        data["from"] = this.from;
+        data["to"] = this.to;
+        data["itrNo"] = this.itrNo;
+        data["daysDue"] = this.daysDue;
+        data["itNo"] = this.itNo;
+        data["status"] = this.status;
+        data["docRemarks"] = this.docRemarks;
+        data["group"] = this.group;
+        return data; 
+    }
+}
+
+export interface IFilterITR {
+    docDate?: Date;
+    from?: string;
+    to?: string;
+    itrNo?: number;
+    daysDue?: number;
+    itNo?: string;
+    status?: string;
+    docRemarks?: string;
+    group?: string;
 }
 
 export class ProdOrderDetails implements IProdOrderDetails {
