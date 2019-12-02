@@ -54,7 +54,7 @@ import { ForProductionComponent } from './views/for-production/for-production.co
 import { GoodsIssueComponent } from './views/goods-issue/goods-issue.component';
 import { GoodsReceiptComponent } from './views/goods-receipt/goods-receipt.component';
 import { JoborderMonitoringComponent } from './views/joborder-monitoring/joborder-monitoring.component';
-import { AccountComponent } from './views/account/account.component';
+import { AccountsComponent } from './views/account/account.component';
 
 // Import API Service
 import { Service } from './core/api.client';
@@ -99,7 +99,7 @@ import { ArIpComponent } from './views/ar-ip/ar-ip.component';
     GoodsIssueComponent,
     GoodsReceiptComponent,
     JoborderMonitoringComponent,
-    AccountComponent,
+    AccountsComponent,
     ArIpComponent
   ],
   providers: [Service,

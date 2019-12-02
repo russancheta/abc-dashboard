@@ -31,5 +31,19 @@ namespace AspNetAngular.Controllers
             var branchList = await _context.Branches.FromSql(branchListQuery).ToListAsync();
             return branchList;
         }
+
+        [HttpGet("getLocationList")]
+        public async Task<ActionResult<IEnumerable<Locations>>> getLocationList()
+        {
+            var branchListQuery = @"
+                select
+	                a.Name [Location]
+                from
+	                [@BOCODE] a
+                order by
+                    a.Name";
+            var branchList = await _context.Locations.FromSql(branchListQuery).ToListAsync();
+            return branchList;
+        }
     }
 }

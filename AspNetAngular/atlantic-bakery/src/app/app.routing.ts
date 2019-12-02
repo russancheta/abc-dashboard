@@ -12,6 +12,7 @@ import { ABCDashboardComponent } from './views/abc-dashboard/abc-dashboard.compo
 import { ProductionOrderComponent } from './views/production-order/production-order.component';
 import { ForProductionComponent } from './views/for-production/for-production.component';
 import { ArIpComponent } from './views/ar-ip/ar-ip.component';
+import { AccountsComponent } from './views/account/account.component';
 
 export const routes: Routes = [
   {
@@ -80,6 +81,13 @@ export const routes: Routes = [
         component: ArIpComponent,
         data: {
           title: 'AR/IP Monitoring'
+        }
+      },
+      {
+        path: 'account',
+        component: AccountsComponent,
+        data: {
+          title: 'Account'
         }
       },
       {

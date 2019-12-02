@@ -10,10 +10,10 @@ namespace AspNetAngular.Model
         }
 
         public AtlanticContext(DbContextOptions<AtlanticContext> options)
-            :base(options)
-            {
-                
-            }
+            : base(options)
+        {
+
+        }
 
         public virtual DbQuery<ARIPMonitoring> ARIPMonitoring { get; set; }
         public virtual DbQuery<ARIPDetails> ARIPDetails { get; set; }
@@ -31,7 +31,8 @@ namespace AspNetAngular.Model
         public virtual DbQuery<JobOrder> JobOrder { get; set; }
         public virtual DbQuery<JobOrderDetails> JobOrderDetails { get; set; }
         public virtual DbQuery<ITRNos> ITRNos { get; set; }
-        public virtual DbQuery<Branches> Branches { get; set;}
+        public virtual DbQuery<Branches> Branches { get; set; }
         public virtual DbQuery<FilterITR> FilterITR { get; set; }
+        public virtual DbQuery<Locations> Locations { get; set; }
     }
 }
