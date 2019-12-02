@@ -44,13 +44,18 @@ export const navItems: NavData[] = [
     name: 'Main'
   },
   {
-    name: 'Production Monitoring',
+    name: 'Prod. Monitoring',
     url: '/for-production',
     icon: 'fa fa-paste'
   },
   {
-    name: 'ITR / IT Monitoring',
+    name: 'ITR/IT Monitoring',
     url: '/production-order',
     icon: 'fa fa-copy'
+  },
+  {
+    name: 'AR/IP Monitoring',
+    url: '/ar-ip',
+    icon: 'fa fa-check-square-o'
   }
 ];

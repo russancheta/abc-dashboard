@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { ProductionForecast, ProductionForecastDetails, SQGRDifference, ITRNos } from '../../core/api.client';
+import { ProductionForecast, ProductionForecastDetails, SQGRDifference, ITRNos, PMRemarks } from '../../core/api.client';
 import { IssueForProdDetails } from '../../core/api.client';
 import { RepCompletionDetails } from '../../core/api.client';
 import { ProdOrderDetails } from '../../core/api.client';
 import { Branches } from '../../core/api.client';
 import { Service } from '../../core/api.client';
 import { BsModalRef, BsModalService, ModalOptions } from 'ngx-bootstrap';
+import { AuthService } from '../../shared/auth.service';
 import Swal from 'sweetalert2';
 import { interval } from 'rxjs/internal/observable/interval';
 import { startWith, flatMap } from 'rxjs/operators';
@@ -37,7 +38,7 @@ export class ForProductionComponent implements OnInit {
   pollingData: any;
 
   itrNo = '';
-  sqNo = '';
+  sqNo: number = 0;
   giNo = '';
   grNo = '';
 
@@ -61,9 +62,17 @@ export class ForProductionComponent implements OnInit {
   selectedSQ = new Array();
   checkSelected = 0;
 
+  // Form validation
+  submitBtn = false;
+
+  // Production Monitoring
+  remarks : PMRemarks[] = [];
+  remarksMessage: string;
+
   constructor(
     private apiService: Service,
-    private modalService: BsModalService
+    private modalService: BsModalService,
+    public authService: AuthService
   ) { }
 
   ngOnInit() {
@@ -140,19 +149,19 @@ export class ForProductionComponent implements OnInit {
     this.itrNo = itrNo.toString();
   }
 
-  soDetails(content: any, sqNo: number, itrNo: string) {
+  sqDetails(content: any, sqNo: number, itrNo: string) {
     console.log(itrNo);
     this.itrNo = itrNo;
     this.getProdForecastDetails(sqNo);
     this.getITRCompareSQ(itrNo);
     this.modalRef = this.modalService.show(content, { backdrop: 'static', class: 'modal-xl' });
-    this.sqNo = sqNo.toString();
+    this.sqNo = sqNo;
   }
 
   giDetails(content: any, giNo: number) {
     this.getGoodsIssueDetails(giNo);
     this.modalRef = this.modalService.show(content, { backdrop: 'static', class: 'modal-xl' });
-    this.sqNo = giNo.toString();
+    this.sqNo = giNo;
   }
 
   grDetails(content: any, grNo: number) {
@@ -216,6 +225,37 @@ export class ForProductionComponent implements OnInit {
     });
   }
 
+  onSubmitRemarks() {
+    this.submitBtn = true;
+    const pmRemarks = new PMRemarks();
+    pmRemarks.logDate = new Date();
+    pmRemarks.logName = this.authService.getCurrentUser().fullName;
+    pmRemarks.remarks = this.remarksMessage;
+    pmRemarks.sqNo = this.sqNo;
+    this.apiService.insertPMRemarks(pmRemarks).subscribe(response => {
+      if (response.result == 'success') {
+        this.getRemarks(this.sqNo);
+        this.remarksMessage = '';
+        this.submitBtn = false;
+      }
+    }, error => {
+      this.submitBtn = false;
+      console.log('HTTP error', error);
+    })
+  }
+
+  getRemarks(sqNo: number) {
+    this.apiService.getPMRemarks(sqNo).subscribe(response => {
+      this.remarks = response;
+    }, error => {
+      console.log('HTTP error', error);
+    })
+  }
+
+  updateRemarks(remarks: string, sqNo: number){
+    
+  }
+
   closeModal() {
     this.modalRef.hide();
   }
@@ -229,7 +269,7 @@ export class ForProductionComponent implements OnInit {
   }
 
   openModalListRemarks(content: any, sqNo: number) {
-    this.sqNo = sqNo.toString();
+    this.sqNo = sqNo;
     this.modalRef = this.modalService.show(content, { backdrop: 'static' });
   }
 

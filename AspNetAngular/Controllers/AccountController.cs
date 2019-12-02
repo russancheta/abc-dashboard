@@ -37,7 +37,7 @@ namespace AspNetAngular.Controllers
         }
 
         // GET api/accounts
-        [HttpGet]
+        [HttpGet("getAllUsers")]
         public async Task<ActionResult<IEnumerable<Account>>> GetAllUsers()
         {
             var rawQuery = @"
@@ -86,7 +86,7 @@ namespace AspNetAngular.Controllers
         }
 
         // GET api/accounts/id
-        [HttpGet("user/{user_id}")]
+        [HttpGet("viewUser/{user_id}")]
         public async Task<ActionResult<ResultReponser>> viewUser(string user_id)
         {
             var locations = await _context.UserLocations

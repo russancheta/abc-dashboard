@@ -1,6 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { HttpClientModule } from '@angular/common/http'
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { LocationStrategy, HashLocationStrategy } from '@angular/common';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
@@ -53,6 +54,7 @@ import { ForProductionComponent } from './views/for-production/for-production.co
 import { GoodsIssueComponent } from './views/goods-issue/goods-issue.component';
 import { GoodsReceiptComponent } from './views/goods-receipt/goods-receipt.component';
 import { JoborderMonitoringComponent } from './views/joborder-monitoring/joborder-monitoring.component';
+import { AccountComponent } from './views/account/account.component';
 
 // Import API Service
 import { Service } from './core/api.client';
@@ -61,11 +63,14 @@ import { Service } from './core/api.client';
 import { API_BASE_URL } from './core/api.client';
 import { } from '../environments/environment';
 import { environment } from '../environments/environment.prod';
+import { ArIpComponent } from './views/ar-ip/ar-ip.component';
 
 @NgModule({
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
+    FormsModule,
+    ReactiveFormsModule,
     AppRoutingModule,
     AppAsideModule,
     AppBreadcrumbModule.forRoot(),
@@ -93,9 +98,11 @@ import { environment } from '../environments/environment.prod';
     ForProductionComponent,
     GoodsIssueComponent,
     GoodsReceiptComponent,
-    JoborderMonitoringComponent
+    JoborderMonitoringComponent,
+    AccountComponent,
+    ArIpComponent
   ],
-  providers: [Service, 
+  providers: [Service,
     HttpClientModule,
     {
       provide: API_BASE_URL, useFactory: () => {

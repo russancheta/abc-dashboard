@@ -57,8 +57,7 @@ namespace AspNetAngular.Controllers
                     OIGE a
                     inner join IGE1 b on a.DocEntry = b.DocEntry
                 where
-                    a.DocNum = {0}
-                                        ";
+                    a.DocNum = {0}";
             var issueProdDetails = await _context.IssueForProdDetails.FromSql(issueProdDetailsQuery, docnum).ToListAsync();
             return issueProdDetails;
         }

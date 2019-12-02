@@ -155,8 +155,8 @@ namespace AspNetAngular.Controllers
             return itrNos;
         }
 
-        [HttpPost("insertremarks")]
-        public async Task<ActionResult<ResultReponser>> sqInsertRemarks(PMRemarks model)
+        [HttpPost("insertPMRemarks")]
+        public async Task<ActionResult<ResultReponser>> insertPMRemarks(PMRemarks model)
         {
             _authDbContext.PMRemarks.Add(model);
             var insert = await _authDbContext.SaveChangesAsync();
@@ -180,12 +180,44 @@ namespace AspNetAngular.Controllers
             }
         }
 
+        [HttpPut("updateSQRemarks")]
+        public async Task<ActionResult<ResultReponser>> updateSQRemarks(string remarks, int sqNo)
+        {
+            var rawQuery = @"UPDATE A SET A.U_UpdateRemarks = {0} FROM ORDR A WHERE A.DocNum = {1}";
+            var update = await _context.Database.ExecuteSqlCommandAsync(rawQuery, remarks, sqNo);
+            if (update > 0)
+            {
+                return new ResultReponser
+                {
+                    Result = "success",
+                    Message = "Successfully updated remarks",
+                    ResponseData = ""
+                };
+            }
+            else
+            {
+                return new ResultReponser
+                {
+                    Result = "failed",
+                    Message = "failed to update remarks",
+                    ResponseData = ""
+                };
+            }
+        }
+
+        [HttpGet("getPMRemarks")]
+        public async Task<ActionResult<IEnumerable<PMRemarks>>> getPMRemarks(int sqNo)
+        {
+            var remarks = await _authDbContext.PMRemarks.Where(sq => sq.SQNo == sqNo).ToListAsync();
+            return remarks;
+        }
+
         [HttpPut("updateSQ")]
         public async Task<ActionResult<ResultReponser>> pickedSQ(int[] sqNo)
         {
             var updateQuery = @"update a set a.U_SQPicked = 'Y' from OQUT a where a.DocNum = {0}";
             int updateCount = 0;
-            foreach(int docNum in sqNo)
+            foreach (int docNum in sqNo)
             {
                 updateCount += await _context.Database.ExecuteSqlCommandAsync(updateQuery, docNum);
             }

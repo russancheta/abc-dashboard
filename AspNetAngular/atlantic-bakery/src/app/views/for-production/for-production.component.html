@@ -20,7 +20,7 @@
                 <div class="table-responsive">
                     <div class="d-flex flex-row-reverse" *ngIf="selectedSQ.length > 0">
                         <p>Selected: <strong> {{ selectedSQ.length }} - </strong> <button type="button"
-                            class="btn btn-primary btn-sm" (click)="closeSQ(selectedSQ)">Close</button>
+                                class="btn btn-primary btn-sm" (click)="closeSQ(selectedSQ)">Close</button>
                         </p>
                     </div>
                     <table class="table table-hover table-sm">
@@ -42,7 +42,7 @@
                                 <td> {{ o.docDate | date: 'yyyy-MM-dd' }} </td>
                                 <td popover="Remarks: {{ o.docRemarks }}" triggers="mouseenter:mouseleave">
                                     <button style="color: #2980b9" type="button" class="btn btn-link btn-sm"
-                                        (click)="soDetails(sqModal, o.docNum, o.itrNo)"> {{ o.docNum }}</button>
+                                        (click)="sqDetails(sqModal, o.docNum, o.itrNo)"> {{ o.docNum }}</button>
                                 </td>
                                 <td> {{ o.daysDue }} </td>
                                 <!-- <td>
@@ -308,13 +308,15 @@
         <button type="button" class="close" aria-label="Close" (click)="closeModalRemarks()">
             <span aria-hidden="true">&times;</span>
         </button>
-        <div class="form-group">
-            <label><strong>Remarks</strong></label>
-            <textarea class="form-control" rows="5"></textarea>
-        </div>
-        <div class="d-flex flex-row-reverse">
-            <button type="button" class="btn btn-primary">Save</button>
-        </div>
+        <form>
+            <div class="form-group">
+                <label><strong>Remarks</strong></label>
+                <textarea class="form-control" rows="5"></textarea>
+            </div>
+            <div class="d-flex flex-row-reverse">
+                <button type="button" class="btn btn-primary">Save</button>
+            </div>
+        </form>
     </div>
 </ng-template>
 

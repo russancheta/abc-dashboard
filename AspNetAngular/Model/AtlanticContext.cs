@@ -15,6 +15,8 @@ namespace AspNetAngular.Model
                 
             }
 
+        public virtual DbQuery<ARIPMonitoring> ARIPMonitoring { get; set; }
+        public virtual DbQuery<ARIPDetails> ARIPDetails { get; set; }
         public virtual DbQuery<ProductionOrder> ProductionOrder { get; set; }
         public virtual DbQuery<ProdOrderDetails> ProdOrderDetails { get; set; }
         public virtual DbQuery<InvTransferDetails> InvTransferDetails { get; set; }
