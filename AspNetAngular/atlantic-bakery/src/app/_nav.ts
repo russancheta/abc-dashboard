@@ -57,5 +57,10 @@ export const navItems: NavData[] = [
     name: 'AR/IP Monitoring',
     url: '/ar-ip',
     icon: 'fa fa-check-square-o'
+  },
+  {
+    name: 'Account',
+    url: '/account',
+    icon: 'fa fa-check-square-o'
   }
 ];

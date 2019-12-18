@@ -1,1 +1,174 @@
-<p>account works!</p>
+<div class="animated fadeIn">
+    <h5>Account Management</h5>
+    <ngb-tabset>
+        <ngb-tab>
+            <ng-template ngbTabTitle>Accounts <span class="badge badge-primary">{{ users.length }}</span></ng-template>
+            <ng-template ngbTabContent>
+                <div class="d-flex justify-content-between" style="margin-bottom: 1rem;">
+                    <div class="input-group input-group-sm" style="width: 20%;">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">@</span>
+                        </div>
+                        <input type="text" class="form-control" placeholder="Email"
+                            (input)="searchUser($event.target.value)">
+                    </div>
+                    <button type="button" class="btn btn-primary btn-sm"
+                        (click)="openModal(accModal, 'Create Account')">Create <i class="fa fa-plus"></i></button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover table-sm">
+                        <thead>
+                            <tr>
+                                <th class="text-center"><i class="fa fa-eye"></i></th>
+                                <th>Email</th>
+                                <th>Full Name</th>
+                                <th>User Type</th>
+                                <th class="text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let o of users">
+                                <td class="text-center">
+                                    <button type="button" class="btn btn-link btn-sm"
+                                        (click)="openModal(accModal, 'Account Info', o.id)">
+                                        View
+                                    </button>
+                                </td>
+                                <td>{{ o.userName }}</td>
+                                <td>{{ o.lastName }}, {{ o.firstName }} {{ o.middleName }}</td>
+                                <td>{{ o.roleName }}</td>
+                                <td class="text-center">
+                                    <button type="button" class="btn btn-link btn-sm"
+                                        (click)="resetPassword(o.userName)">
+                                        Reset Password
+                                    </button>
+                                    <button type="button" class="btn btn-link btn-sm" (click)="deleteAccount(o.id)">
+                                        Delete
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <ngb-pagination [(page)]="page" [pageSize]="pageSize" [maxSize]="10" [collectionSize]="users.length"
+                        [boundaryLinks]="true"></ngb-pagination>
+                </div>
+            </ng-template>
+        </ngb-tab>
+    </ngb-tabset>
+</div>
+
+<ng-template #accModal let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title" id="modal-basic-title">{{ modalHeader }}</h4>
+        <button type="button" class="close" aria-label="Close" (click)="closeModal()">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <form [formGroup]="formreg" (ngSubmit)="onSubmit()">
+            <ng-template [ngIf]="modalHeader == 'Create Account'">
+                <div class="alert alert-danger" *ngIf="alertPasswordNotMatch">
+                    Passsword and ConfirmPassword didn't match.
+                </div>
+            </ng-template>
+            <div class="form-row">
+                <div class="form-group col-md-4">
+                    <label>Last Name</label>
+                    <input type="text" class="form-control" formControlName="lastName" placeholder="Last Name">
+                </div>
+                <div class="form-group col-md-4">
+                    <label>First Name</label>
+                    <input type="text" class="form-control" formControlName="firstName" placeholder="First Name">
+                </div>
+                <div class="form-group col-md-4">
+                    <label>Middle Name</label>
+                    <input type="text" class="form-control" formControlName="middleName" placeholder="Middle Name">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label>Email</label>
+                    <input type="email" class="form-control" formControlName="email" placeholder="Email">
+                </div>
+                <div class="form-group col-md-6">
+                    <label>User Type</label>
+                    <select class="form-control" formControlName="userType">
+                        <option *ngFor="let uType of userTypes" [value]="uType">{{ uType }}</option>
+                    </select>
+                </div>
+            </div>
+            <ng-template [ngIf]="modalHeader == 'Create Account'">
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label>Password</label>
+                        <input type="password" class="form-control" formControlName="password" placeholder="Password">
+                        <small id="passwordHelpBlock" class="form-text text-muted">
+                            Your password must be 6-32 characters long.
+                        </small>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label>Confirm Password</label>
+                        <input type="password" class="form-control" formControlName="confirmpassword"
+                            placeholder="Repeat Password">
+                    </div>
+                </div>
+            </ng-template>
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <div class="card" style="height:535px;">
+                        <div class="card-header">
+                            List of Location
+                            <!-- <div class="form-check">
+                                <input class="form-check-input" type="checkbox" (change)="checkAll($event.target)">
+                                <label class="form-check-label">
+                                  {{ checkLabel }}
+                                </label>
+                              </div> -->
+                        </div>
+                        <ul class="list-group list-group-flush">
+                            <li *ngFor="let o of accountSeries" class="list-group-item">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="{{o.value}}"
+                                        [ngModelOptions]="{standalone: true}" [(ngModel)]="o.checked"
+                                        (change)="checkSeries($event.target.value)">
+                                    <label class="form-check-label">
+                                        {{ o.value }}
+                                    </label>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="form-group col-md-6">
+                    <div class="card" style="height:535px;">
+                        <div class="card-header">
+                            General Authorizations
+                        </div>
+                        <div class="card-body">
+                            <ng-container *ngFor="let o of accountFeatures">
+                                <ng-template [ngIf]="o.column == 'PM'">
+                                    <hr class="my-3">
+                                </ng-template>
+                                <ng-template [ngIf]="o.column == 'ITRM'">
+                                    <hr class="my-3">
+                                </ng-template>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox"
+                                        [ngModelOptions]="{standalone: true}" [(ngModel)]="o.checked">
+                                    <label class="form-check-label">
+                                        {{ o.label }}
+                                    </label>
+                                </div>
+                            </ng-container>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex flex-row-reverse">
+                <button type="submit" class="btn btn-primary"
+                    [disabled]="!formreg.valid || selectedSeries.length == 0">{{ modalBtn }}</button>
+            </div>
+        </form>
+    </div>
+</ng-template>
