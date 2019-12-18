@@ -594,6 +594,66 @@ export class Service {
     }
 
     /**
+     * @param docNum (optional) 
+     * @return Success
+     */
+    getIPDetails(docNum: number | undefined): Observable<IPDetails[]> {
+        let url_ = this.baseUrl + "/api/controll/getIPDetails?";
+        if (docNum === null)
+            throw new Error("The parameter 'docNum' cannot be null.");
+        else if (docNum !== undefined)
+            url_ += "docNum=" + encodeURIComponent("" + docNum) + "&"; 
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetIPDetails(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetIPDetails(<any>response_);
+                } catch (e) {
+                    return <Observable<IPDetails[]>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<IPDetails[]>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetIPDetails(response: HttpResponseBase): Observable<IPDetails[]> {
+        const status = response.status;
+        const responseBlob = 
+            response instanceof HttpResponse ? response.body : 
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200.push(IPDetails.fromJS(item));
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<IPDetails[]>(<any>null);
+    }
+
+    /**
      * @param body (optional) 
      * @return Success
      */
@@ -2465,6 +2525,62 @@ export interface IARIPDetails {
     quantity?: number;
     price?: number;
     lineTotal?: number;
+}
+
+export class IPDetails implements IIPDetails {
+    cashAcct?: string;
+    cashSum?: number;
+    checkAcct?: string;
+    checkSum?: number;
+    trsfrAcct?: string;
+    trsfrSum?: number;
+
+    constructor(data?: IIPDetails) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            this.cashAcct = data["cashAcct"];
+            this.cashSum = data["cashSum"];
+            this.checkAcct = data["checkAcct"];
+            this.checkSum = data["checkSum"];
+            this.trsfrAcct = data["trsfrAcct"];
+            this.trsfrSum = data["trsfrSum"];
+        }
+    }
+
+    static fromJS(data: any): IPDetails {
+        data = typeof data === 'object' ? data : {};
+        let result = new IPDetails();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["cashAcct"] = this.cashAcct;
+        data["cashSum"] = this.cashSum;
+        data["checkAcct"] = this.checkAcct;
+        data["checkSum"] = this.checkSum;
+        data["trsfrAcct"] = this.trsfrAcct;
+        data["trsfrSum"] = this.trsfrSum;
+        return data; 
+    }
+}
+
+export interface IIPDetails {
+    cashAcct?: string;
+    cashSum?: number;
+    checkAcct?: string;
+    checkSum?: number;
+    trsfrAcct?: string;
+    trsfrSum?: number;
 }
 
 export class CredentialsViewModel implements ICredentialsViewModel {

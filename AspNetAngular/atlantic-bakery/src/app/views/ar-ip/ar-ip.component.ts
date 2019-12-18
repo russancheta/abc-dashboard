@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Service } from '../../core/api.client';
-import { ARIPMonitoring, ARIPDetails } from '../../core/api.client';
+import { ARIPMonitoring, ARIPDetails, IPDetails } from '../../core/api.client';
 import { Branches } from '../../core/api.client';
 import { BsModalRef, BsModalService, ModalOptions } from 'ngx-bootstrap';
 import Swal from 'sweetalert2';
@@ -14,9 +14,11 @@ export class ArIpComponent implements OnInit {
 
   aripMonitoring: ARIPMonitoring[] = [];
 
-  arNo = '';
+  arDetails: ARIPDetails[] = [];
+  arNo = 0;
 
-  aripDetails: ARIPDetails[] = [];
+  ipDetails: IPDetails[] = [];
+  ipNo = 0;
 
   branch = '';
   branchList: Branches[] = [];
@@ -47,14 +49,26 @@ export class ArIpComponent implements OnInit {
 
   getARDetails(docNum: number) {
     this.apiService.getARIPDetails(docNum).subscribe(response => {
-      this.aripDetails = response;
+      this.arDetails = response;
     })
   }
 
-  arDetails(content: any, arNo: number) {
+  arModalDetails(content: any, arNo: number) {
     this.getARDetails(arNo);
     this.modalRef = this.modalService.show(content, { backdrop: 'static', class: 'modal-lg'})
-    this.arNo = arNo.toString();
+    this.arNo = arNo
+  }
+
+  getIPDetails(docNum: number) {
+    this.apiService.getIPDetails(docNum).subscribe(response => {
+      this.ipDetails = response;
+    })
+  }
+
+  ipModalDetails(content: any, ipNo: number) {
+    this.getIPDetails(ipNo);
+    this.modalRef = this.modalService.show(content, { backdrop: 'static', class: 'modal-lg'})
+    this.ipNo = ipNo;
   }
 
   getBranchList() {

@@ -36,10 +36,11 @@
                                 *ngFor="let i of aripMonitoring | slice: (page-1) * pageSize : (page-1) * pageSize + pageSize">
                                 <td> {{ i.docDate | date: 'yyyy-MM-dd'}} </td>
                                 <td> <button type="button" class="btn btn-link btn-sm"
-                                    (click)="arDetails(arModal, i.arNo)"> {{ i.arNo }} </button> </td>
+                                        (click)="arModalDetails(arModal, i.arNo)"> {{ i.arNo }} </button> </td>
                                 <td> {{ i.cardName }} </td>
                                 <td> {{ i.daysDue }} </td>
-                                <td> {{ i.ipNo }} </td>
+                                <td> <button type="button" class="btn btn-link btn-sm"
+                                        (click)="ipModalDetails(ipModal, i.ipNo)"> {{ i.ipNo }} </button> </td>
                                 <td> {{ i.status }} </td>
                                 <td class="text-center">
                                     <button type="button"><i class="fa fa-pencil-square-o fa-lg"></i></button>
@@ -81,11 +82,42 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr *ngFor="let i of aripDetails">
+                        <tr *ngFor="let i of arDetails">
                             <td> {{ i.itemCode }} </td>
                             <td> {{ i.dscription }} </td>
                             <td> {{ i.price }} </td>
                             <td> {{ i.lineTotal }} </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</ng-template>
+<ng-template #ipModal>
+    <div class="modal-header">
+        <h4 class="modal-title" id="modal-basic-title">Incoming Payment</h4>
+        <button type="button" class="close" aria-label="close" (click)="closeModal()">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <strong>Incoming Payment Details (IP. No. {{ ipNo }})</strong>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover-sm">
+                    <thead>
+                        <tr>
+                            <th>Cash Sum</th>
+                            <th>Check Sum</th>
+                            <th>Transfer Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let i of ipDetails">
+                            <td> {{ i.cashSum }} </td>
+                            <td> {{ i.checkSum }} </td>
+                            <td> {{ i.trsfrSum }} </td>
                         </tr>
                     </tbody>
                 </table>

@@ -75,5 +75,24 @@ namespace AspNetAngular.Controllers
             var queryResult = await _context.ARIPDetails.FromSql(rawQuery, docNum).ToListAsync();
             return queryResult;
         }
+
+        [HttpGet("getIPDetails")]
+        public async Task<ActionResult<IEnumerable<IPDetails>>> getIPDetails(int docNum)
+        {
+            var rawQuery = @"
+                select
+                    A.CashAcct,
+                    A.CashSum,
+                    A.CheckAcct,
+                    A.CheckSum,
+                    A.TrsfrAcct,
+                    A.TrsfrSum
+                from
+                    ORCT A
+                where
+                    A.DocNum = {0}";
+            var queryResult = await _context.IPDetails.FromSql(rawQuery, docNum).ToListAsync();
+            return queryResult;
+        }
     }
 }
