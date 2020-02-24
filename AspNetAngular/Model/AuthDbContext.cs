@@ -19,6 +19,7 @@ namespace AspNetAngular.Model
 
         public virtual DbSet<PMRemarks> PMRemarks { get; set; }
         public virtual DbSet<ITRMRemarks> ITRMRemarks { get; set; }
+        public virtual DbSet<ARMRemarks> ARMRemarks { get; set; }
         public virtual DbQuery<Account> Account { get; set; }
         public virtual DbSet<UserLocations> UserLocations { get; set; }
 

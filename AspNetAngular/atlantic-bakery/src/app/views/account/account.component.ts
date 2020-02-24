@@ -94,7 +94,10 @@ export class AccountsComponent implements OnInit {
       { label: 'Remove From List', column: 'PMPick', checked: false },
       { label: 'ITR / IT Monitoring', column: 'ITRM', checked: false },
       { label: 'ITRM Remarks', column: 'ITRMRemarks', checked: false },
-      { label: 'Remove From List', column: 'ITRMPick', checked: false }
+      { label: 'Remove From List', column: 'ITRMPick', checked: false },
+      { label: 'AR / IP Monitoring', column: 'ARM', checked: false},
+      { label: 'AR Remarks', column: 'ARMRemarks', checked: false},
+      { label: 'Remove From List', column: 'ARMPick', checked: false}
     ];
   }
 

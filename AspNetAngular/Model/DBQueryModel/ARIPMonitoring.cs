@@ -9,11 +9,14 @@ namespace AspNetAngular.Model
         public int DaysDue { get; set; }
         public string CardName { get; set; }
         public string IPNo { get; set; }
+        public string DepositNo { get; set; }
         public string Status { get; set; }
         public decimal DocTotal { get; set; }
         public decimal PaidSum { get; set; }
         public decimal TotalPayment { get; set; }
+        public decimal TotalDeposit { get; set; }
         public int DocEntry { get; set; }
         public string Remarks { get; set; }
+        public string Groupname { get; set; }
     }
 }

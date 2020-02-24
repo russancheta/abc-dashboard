@@ -21,6 +21,10 @@ export class ForProductionComponent implements OnInit {
   invTransferReqDetails: ProdOrderDetails[] = [];
 
   productionForecast: ProductionForecast[] = [];
+
+  containerPF: ProductionForecast[] = [];
+  returnPF: ProductionForecast[] = [];
+
   productionForecastDetails: ProductionForecastDetails[] = [];
   itrs: ProductionForecastDetails[] = [];
 
@@ -68,6 +72,17 @@ export class ForProductionComponent implements OnInit {
   // Production Monitoring
   remarks : PMRemarks[] = [];
   remarksMessage: string;
+  remarksLength: number = 0;
+
+  // Status filter
+  statusFilter = [
+    { value: 'All', label: 'All' },
+    { value: 'Fully Served', label: 'Fully Served' },
+    { value: 'Partially Served', label: 'Partially Served' },
+    { value: 'Over', label: 'Over' },
+    { value: 'Unserved', label: 'Unserved' }
+  ];
+  filterAll: string = 'All';
 
   constructor(
     private apiService: Service,
@@ -89,8 +104,9 @@ export class ForProductionComponent implements OnInit {
     this.branch = branch;
     this.apiService.getProductionForecast(branch).subscribe(response => {
       this.productionForecast = response;
+      this.returnPF = response;
+      this.containerPF = response;
       Swal.close();
-      console.table(response);
     });
   }
 
@@ -129,7 +145,6 @@ export class ForProductionComponent implements OnInit {
   getITRNos(docNum: number) {
     this.apiService.getITRNos(docNum).subscribe(response => {
       this.itrNos = response;
-      console.log(response);
     });
   }
 
@@ -229,7 +244,7 @@ export class ForProductionComponent implements OnInit {
     this.submitBtn = true;
     const pmRemarks = new PMRemarks();
     pmRemarks.logDate = new Date();
-    pmRemarks.logName = this.authService.getCurrentUser().fullName;
+    pmRemarks.logName = 'test';//this.authService.getCurrentUser().fullName;
     pmRemarks.remarks = this.remarksMessage;
     pmRemarks.sqNo = this.sqNo;
     this.apiService.insertPMRemarks(pmRemarks).subscribe(response => {
@@ -247,6 +262,7 @@ export class ForProductionComponent implements OnInit {
   getRemarks(sqNo: number) {
     this.apiService.getPMRemarks(sqNo).subscribe(response => {
       this.remarks = response;
+      this.remarksLength = response.length;
     }, error => {
       console.log('HTTP error', error);
     })
@@ -266,10 +282,24 @@ export class ForProductionComponent implements OnInit {
 
   onChangeBranch(branch: string) {
     this.getProdForecast(branch);
+    this.branch = branch;
+  }
+
+  onChangeStatus(status: string) {
+    this.filterAll = status;
+    if (status == 'All') {
+      this.getProdForecast(this.branch);
+    } else {
+      this.showLoading();
+      this.returnPF = this.containerPF;
+      this.returnPF = this.returnPF.filter(o => o.status.includes(status));
+      Swal.close();
+    }
   }
 
   openModalListRemarks(content: any, sqNo: number) {
     this.sqNo = sqNo;
+    this.getRemarks(sqNo);
     this.modalRef = this.modalService.show(content, { backdrop: 'static' });
   }
 

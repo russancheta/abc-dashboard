@@ -59,7 +59,7 @@ namespace AspNetAngular.Controllers
 					left join OIGN C on A.DocEntry = C.U_FCDocEntry
 					left join IGN1 E on C.DocEntry = E.DocEntry and E.ItemCode = B.ItemCode
                 where
-                    A.DocStatus = 'O'
+                    A.CANCELED = 'N'
                     and D.Name = {0}
                     and A.U_SQPicked = 'No'
                     --and A.Comments like 'ITR N%'

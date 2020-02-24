@@ -112,8 +112,11 @@ namespace AspNetAngular.Controllers
                         PMRemarks = u.PMRemarks,
                         PMPick = u.PMPick,
                         ITRM = u.ITRM,
-                        ITRMRemarks = u.ITRMRemarks,
-                        ITRMPick = u.ITRMPick
+                        ITRRemarks = u.ITRMRemarks,
+                        ITRMPick = u.ITRMPick,
+                        ARM = u.ARM,
+                        ARMRemarks = u.ARMRemarks,
+                        ARMPick = u.ARMPick
                     },
                     Locations = locations,
                     Role = roles.FirstOrDefault()
@@ -229,7 +232,7 @@ namespace AspNetAngular.Controllers
                 PMRemarks = {5},
                 PMPick = {6},
                 ITRM = {7},
-                ITRMRemarks = {8},
+                ITRRemarks = {8},
                 ITRMPick = {9}
                 WHERE Id = {0}";
             var updateUser = await _context.Database.ExecuteSqlCommandAsync(

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Service } from '../../core/api.client';
-import { ProductionOrder, ProdOrderDetails, InvTransferDetails, ITRITDifference } from '../../core/api.client';
+import { ProductionOrder, ProdOrderDetails, InvTransferDetails, ITRITDifference, ITRMRemarks } from '../../core/api.client';
 import { Branches } from '../../core/api.client';
 import { BsModalRef, BsModalService, ModalOptions } from 'ngx-bootstrap';
 import Swal from 'sweetalert2';
@@ -26,7 +26,7 @@ export class ProductionOrderComponent implements OnInit {
   fromWhse = 'All';
   toWhse = 'All';
 
-  itrNo = '';
+  itrNo: number = 0;
   itNo = '';
 
   modalRef: BsModalRef;
@@ -45,18 +45,34 @@ export class ProductionOrderComponent implements OnInit {
   selectedITR = new Array();
   checkSelected = 0;
 
-  filterOption = [
-    { value: 'All', label: 'All' },
-    { value: 'Finished Goods', label: 'Finished Goods' },
-    { value: 'Raw Materials', label: 'Raw Materials' },
-    { value: 'Intermediate', label: 'Intermediate' },
-    { value: 'Packaging & Other Materials', label: 'Packaging & Other Materials' }
+  // form validation
+  submitBtn = false;
+
+  // ITR/IT Monitoring
+  remarks: ITRMRemarks[] = [];
+  remarksMessage: string;
+
+  itemGroup = [
+    { value: 'All', name: 'All' },
+    { value: 'Finished Goods', name: 'Finished Goods' },
+    { value: 'Raw Materials', name: 'Raw Materials' },
+    { value: 'Intermediate', name: 'Intermediate' },
+    { value: 'Packaging & Other Materials', name: 'Packaging & Other Materials' }
+  ];
+
+  statusFilter = [
+    { value: 'All', name: 'All' },
+    { value: 'Fully Served', name: 'Fully Served' },
+    { value: 'Partially Served', name: 'Partially Served' },
+    { value: 'Over', name: 'Over' },
+    { value: 'Unserved', name: 'Unserved' }
   ];
 
   filterOptionValue = 'All';
 
   fromFilter = '';
   fromBranch = '';
+  status = '';
 
   pollingData: any;
 
@@ -102,7 +118,7 @@ export class ProductionOrderComponent implements OnInit {
   openModal(content: any, itrNo: number) {
     this.getProdOrderDetails(itrNo);
     this.modalRef = this.modalService.show(content, { backdrop: 'static', class: 'modal-xl' })
-    this.itrNo = itrNo.toString();
+    this.itrNo = itrNo;
   }
 
   itDetails(content: any, itNo: number) {
@@ -121,12 +137,11 @@ export class ProductionOrderComponent implements OnInit {
   }
 
   openModalRemarks(content: any) {
-    console.log('Open Modal Remarks');
     this.modalRefRemarks = this.modalService.show(content, { backdrop: 'static' });
   }
 
   openModalListRemarks(content: any, itrNo: number) {
-    this.itrNo = itrNo.toString();
+    this.itrNo = itrNo;
     this.modalRef = this.modalService.show(content, { backdrop: 'static' });
   }
 
@@ -139,9 +154,8 @@ export class ProductionOrderComponent implements OnInit {
   }
 
   onChangeBranch(branch: string) {
-    this.branch = branch;
-    console.log(branch);
     this.getProductionOrder(branch);
+    this.branch = branch;
   }
 
   showLoading() {
@@ -160,7 +174,6 @@ export class ProductionOrderComponent implements OnInit {
 
   itDocNumSplit(docNum: string) {
     const splitDocNum = docNum.split(', ');
-    console.log(splitDocNum);
     return splitDocNum;
   }
 
@@ -172,22 +185,14 @@ export class ProductionOrderComponent implements OnInit {
       // this.productionOrder = [];
       this.getProductionOrder(this.branch);
       this.productionOrder = this.productionOrder.filter(o => o.from.includes(group));
-      console.log(this.branch);
-      console.log(group);
     }
-    console.log(group);
   }
 
   filterFrom(from: string) {
     this.fromWhse = from;
     if (from == 'All') {
       this.getProductionOrder(this.branch);
-      console.log('sdjfkdsjfkld');
-      console.log(this.branch);
-      console.log('dsfdsf');
-      console.log(from);
     } else {
-      //this.getProductionOrder(this.branch);
       this.showLoading();
       this.returnPO = this.containerPO;
       this.returnPO = this.returnPO.filter(o => o.from.includes(from));
@@ -204,7 +209,19 @@ export class ProductionOrderComponent implements OnInit {
       this.returnPO = this.containerPO;
       this.returnPO = this.returnPO.filter(o => o.to.includes(to));
       Swal.close();
-      console.log(to);
+    }
+  }
+
+  filterStatus(selectedStatus: string) {
+    this.status = selectedStatus;
+    if (selectedStatus == 'All') {
+      this.getProductionOrder(this.branch);
+      console.log(this.branch);
+    } else {
+      this.showLoading();
+      this.returnPO = this.containerPO;
+      this.returnPO = this.returnPO.filter(o => o.status.includes(selectedStatus));
+      Swal.close();
     }
   }
 
@@ -250,5 +267,33 @@ export class ProductionOrderComponent implements OnInit {
         });
       }
     });
+  }
+
+  onSubmitRemarks() {
+    this.submitBtn = true;
+    const itrmRemarks = new ITRMRemarks();
+    itrmRemarks.logDate = new Date();
+    itrmRemarks.logName = '';//this.authService.getCurrentUser().fullName;
+    itrmRemarks.remarks = this.remarksMessage;
+    itrmRemarks.itrNo = this.itrNo;
+    console.log(itrmRemarks);
+    this.apiService.insertITRMRemarks(itrmRemarks).subscribe(response => {
+      if (response.result == 'success') {
+        this.getRemarks(this.itrNo);
+        this.remarksMessage = '';
+        this.submitBtn = false;
+      }
+    }, error => {
+      this.submitBtn = false;
+      console.log('HTTP error', error);
+    })
+  }
+
+  getRemarks(itrNo: number) {
+    this.apiService.getITRMRemarks(itrNo).subscribe(response => {
+      this.remarks = response;
+    }, error => {
+      console.log('HTTP error', error);
+    })
   }
 }

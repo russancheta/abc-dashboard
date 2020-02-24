@@ -15,9 +15,11 @@ namespace AspNetAngular.Controllers
     public class ProdOrder : ControllerBase
     {
         private readonly AtlanticContext _context;
+        private readonly AuthDbContext _authDbContext;
 
-        public ProdOrder(AtlanticContext context)
+        public ProdOrder(AtlanticContext context, AuthDbContext authDbContext)
         {
+            _authDbContext = authDbContext;
             _context = context;
         }
 
@@ -44,7 +46,7 @@ namespace AspNetAngular.Controllers
 					FROM OWTR z inner join WTR1 z1 on z.DocEntry = z1.DocEntry 
 					WHERE z1.BaseEntry = a.DocEntry FOR XML PATH('')),1,2,'')), '') 'ITNo',
                     case
-                        when sum(B.Quantity) = sum(C.Quantity) or sum(C.Quantity) > sum(B.Quantity)
+                        when sum(B.Quantity) = sum(C.Quantity) or sum(C.Quantity) = sum(B.Quantity)
                         then 'Fully Served'
                         when sum(B.Quantity) > sum(C.Quantity)
                         then 'Partially Served'
@@ -239,6 +241,38 @@ namespace AspNetAngular.Controllers
                     b.ItemCode";
             var itritDifference = await _context.ITRITDifference.FromSql(rawQuery, docnum).ToListAsync();
             return itritDifference;
+        }
+
+        [HttpPost("insertITRMRemarks")]
+        public async Task<ActionResult<ResultReponser>> insertITRMRemarks(ITRMRemarks model)
+        {
+            _authDbContext.ITRMRemarks.Add(model);
+            var insert = await _authDbContext.SaveChangesAsync();
+            if (insert > 0)
+            {
+                return new ResultReponser
+                {
+                    Result = "success",
+                    Message = "Insert Remarks..",
+                    ResponseData = insert
+                };
+            }
+            else
+            {
+                return new ResultReponser
+                {
+                    Result = "failed",
+                    Message = "Failed to insert remarks.",
+                    ResponseData = insert
+                };
+            }
+        }
+
+        [HttpGet("getITRMRemarks")]
+        public async Task<ActionResult<IEnumerable<ITRMRemarks>>> getITRMRemarks(int itrNo)
+        {
+            var remarks = await _authDbContext.ITRMRemarks.Where(itr => itr.ITRNo == itrNo).ToListAsync();
+            return remarks;
         }
 
         [HttpPut("updateITR")]

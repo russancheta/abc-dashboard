@@ -1,7 +1,7 @@
 <div class="animated fadeIn">
     <h5>Production Order Monitoring</h5>
     <div class="row">
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="form-group">
                 <label>Branch</label>
                 <select class="form-control" (change)="onChangeBranch($event.target.value)">
@@ -11,11 +11,19 @@
                 </select>
             </div>
         </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                <label>Status</label>
+                <select class="form-control" (change)="onChangeStatus($event.target.value)">
+                    <option *ngFor="let o of statusFilter" [value]="o.value"> {{ o.label }} </option>
+                </select>
+            </div>
+        </div>
     </div>
     <ngb-tabset>
         <ngb-tab>
             <ng-template ngbTabTitle>Production Forecast <span class="badge badge-primary">
-                    {{ productionForecast.length }} </span></ng-template>
+                    {{ returnPF.length }} </span></ng-template>
             <ng-template ngbTabContent>
                 <div class="table-responsive">
                     <div class="d-flex flex-row-reverse" *ngIf="selectedSQ.length > 0">
@@ -38,7 +46,7 @@
                         </thead>
                         <tbody>
                             <tr
-                                *ngFor="let o of productionForecast | slice: (page-1) * pageSize : (page-1) * pageSize + pageSize">
+                                *ngFor="let o of returnPF | slice: (page-1) * pageSize : (page-1) * pageSize + pageSize">
                                 <td> {{ o.docDate | date: 'yyyy-MM-dd' }} </td>
                                 <td popover="Remarks: {{ o.docRemarks }}" triggers="mouseenter:mouseleave">
                                     <button style="color: #2980b9" type="button" class="btn btn-link btn-sm"
@@ -97,13 +105,14 @@
                                 </td>
                                 <td>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" (change)="checkedSQ(o.docNum)">
+                                        <input class="form-check-input" type="checkbox" 
+                                            (change)="checkedSQ(o.docNum)">
                                     </div>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
-                    <ngb-pagination [(page)]="page" [pageSize]="pageSize" [collectionSize]="productionForecast.length"
+                    <ngb-pagination [(page)]="page" [pageSize]="pageSize" [collectionSize]="returnPF.length"
                         [maxSize]="10">
                     </ngb-pagination>
                 </div>
@@ -308,13 +317,15 @@
         <button type="button" class="close" aria-label="Close" (click)="closeModalRemarks()">
             <span aria-hidden="true">&times;</span>
         </button>
-        <form>
+        <form (ngSubmit)="onSubmitRemarks()">
             <div class="form-group">
                 <label><strong>Remarks</strong></label>
-                <textarea class="form-control" rows="5"></textarea>
+                <textarea class="form-control" rows="5" [(ngModel)]="remarksMessage"
+                    [ngModelOptions]="{standalone: true}"></textarea>
             </div>
             <div class="d-flex flex-row-reverse">
-                <button type="button" class="btn btn-primary">Save</button>
+                <button type="submit" class="btn btn-primary" [disabled]="submitBtn">Save <i *ngIf="submitBtn"
+                    class="fa fa-spinner fa-spin"></i></button>
             </div>
         </form>
     </div>
@@ -341,10 +352,10 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <!-- <tr *ngFor="let o of remarks">
+                            <tr *ngFor="let o of remarks">
                                 <td>{{ o.logDate | date: 'yyyy-MM-dd' }}</td>
                                 <td>{{ o.remarks }}</td>
-                            </tr> -->
+                            </tr>
                         </tbody>
                     </table>
                 </div>

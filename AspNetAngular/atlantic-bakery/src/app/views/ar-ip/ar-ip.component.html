@@ -11,13 +11,39 @@
                 </select>
             </div>
         </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                <label>Status</label>
+                <select class="form-control" (change)="onChangeStatus($event.target.value)">
+                    <option *ngFor="let s of statusFilter">
+                        {{ s.name }}
+                    </option>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                <label>Customer Group</label>
+                <select class="form-control" (change)="onChangeBPGroup($event.target.value)">
+                    <option value="All"> All </option>
+                    <option *ngFor="let c of customerGroup">
+                        {{ c.groupname }}
+                    </option>
+                </select>
+            </div>
+        </div>
     </div>
     <ngb-tabset>
         <ngb-tab>
             <ng-template ngbTabTitle>A/R Invoice <span class="badge badge-primary">
-                    {{ aripMonitoring.length }} </span> </ng-template>
+                    {{ returnAR.length }} </span> </ng-template>
             <ng-template ngbTabContent>
                 <div class="table-responsive">
+                    <div class="d-flex flex-row-reverse" *ngIf="selectedAR.length > 0">
+                        <p>Selected: <strong> {{ selectedAR.length }} - </strong> <button type="button"
+                            class="btn btn-primary btn-sm">Close</button>
+                        </p>
+                    </div>
                     <table class="table table-hover table-sm">
                         <thead>
                             <tr>
@@ -26,6 +52,7 @@
                                 <th>BP Name</th>
                                 <th>Days Due</th>
                                 <th>IP No.</th>
+                                <th>Dep. No.</th>
                                 <th>Status</th>
                                 <th class="text-center">Remarks</th>
                                 <th>Pick</th>
@@ -33,7 +60,7 @@
                         </thead>
                         <tbody>
                             <tr
-                                *ngFor="let i of aripMonitoring | slice: (page-1) * pageSize : (page-1) * pageSize + pageSize">
+                                *ngFor="let i of returnAR | slice: (page-1) * pageSize : (page-1) * pageSize + pageSize">
                                 <td> {{ i.docDate | date: 'yyyy-MM-dd'}} </td>
                                 <td> <button type="button" class="btn btn-link btn-sm"
                                         (click)="arModalDetails(arModal, i.arNo)"> {{ i.arNo }} </button> </td>
@@ -41,19 +68,45 @@
                                 <td> {{ i.daysDue }} </td>
                                 <td> <button type="button" class="btn btn-link btn-sm"
                                         (click)="ipModalDetails(ipModal, i.ipNo)"> {{ i.ipNo }} </button> </td>
-                                <td> {{ i.status }} </td>
+                                <td>
+                                    <ng-template [ngIf]="i.depositNo.includes(', ')" [ngIfElse]="testOne">
+                                        <div class="btn-group" dropdown>
+                                            <button dropdownToggle type="button"
+                                                class="btn btn-link btn-sm dropdown-toggle">
+                                                View <span class="caret"></span>
+                                            </button>
+                                            <ul *dropdownMenu class="dropdown-menu" role="menu">
+                                                <li role="menuitem" *ngFor="let i of arraySplit(i.depositNo)">
+                                                    <a class="dropdown-item"
+                                                        (click)="depositModalDetails(depositModal, i)"> {{ i }}
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </ng-template>
+                                    <ng-template #testOne>
+                                        <button type="button" class="btn btn-link btn-sm"
+                                            (click)="depositModalDetails(depositModal, i.depositNo)"> {{ i.depositNo }}
+                                        </button>
+                                    </ng-template>
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-link btn-sm"
+                                        (click)="aripdepModalDetails(statusModal, i.docEntry)"> {{ i.status }} </button>
+                                </td>
                                 <td class="text-center">
                                     <button type="button"><i class="fa fa-pencil-square-o fa-lg"></i></button>
                                 </td>
                                 <td>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox">
+                                        <input class="form-check-input" type="checkbox"
+                                            (change)="checkedAR(i.arNo)">
                                     </div>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
-                    <ngb-pagination [(page)]="page" [pageSize]="pageSize" [collectionSize]="aripMonitoring.length"
+                    <ngb-pagination [(page)]="page" [pageSize]="pageSize" [collectionSize]="returnAR.length"
                         [maxSize]="10">
                     </ngb-pagination>
                 </div>
@@ -89,6 +142,14 @@
                             <td> {{ i.lineTotal }} </td>
                         </tr>
                     </tbody>
+                    <tfoot>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td> {{ total }} </td>
+                        </tr>
+                    </tfoot>
                 </table>
             </div>
         </div>
@@ -125,3 +186,149 @@
         </div>
     </div>
 </ng-template>
+<ng-template #depositModal>
+    <div class="modal-header">
+        <h4 class="modal-title" id="modal-basic-title">Deposit</h4>
+        <button type="button" class="close" aria-label="close" (click)="closeModal()">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <strong>Deposit Details (Deposit. No. {{ deposId }})</strong>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover-sm">
+                    <thead>
+                        <tr>
+                            <th>Deposit Date</th>
+                            <th>Bank Account</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let i of depositDetails">
+                            <td> {{ i.deposDate | date: 'yyyy-MM-dd' }} </td>
+                            <td> {{ i.banckAcct }} </td>
+                            <td> {{ i.checkSum }} </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</ng-template>
+<ng-template #statusModal let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title" id="modal-basic-title">AR IP Deposit Difference</h4>
+        <button type="button" class="close" aria-label="close" (click)="closeModal()">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <strong>Details</strong>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover-sm">
+                    <thead>
+                        <tr>
+                            <th>AR Total</th>
+                            <th>IP Total</th>
+                            <th>Deposit Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let i of difference">
+                            <td> {{ i.docTotal }} </td>
+                            <td> {{ i.totalPayment }} </td>
+                            <td> {{ i.totalDeposit }} </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #createRemarks let-modal let-closeCreateRemarks="dismiss">
+    <div class="modal-body">
+        <button type="button" class="close" aria-label="Close" (click)="closeModalRemarks()">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        <form (ngSubmit)="onSubmitRemarks()">
+            <div class="form-group">
+                <label><strong>Remarks</strong></label>
+                <textarea class="form-control" rows="5" [(ngModel)]="remarksMessage"
+                    [ngModelOptions]="{standalone: true}"></textarea>
+            </div>
+            <div class="d-flex flex-row-reverse">
+                <button type="submit" class="btn btn-primary" [disabled]="submitBtn">Save <i *ngIf="submitBtn"
+                    class="fa fa-spinner fa-spin"></i></button>
+            </div>
+        </form>
+    </div>
+</ng-template>
+
+<ng-template #remarksNotes let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title" id="modal-basic-title"><i class="fa fa-user"></i> AR Number ({{ arNo }})</h4>
+        <button type="button" class="close" aria-label="Close" (click)="closeModal()">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <div class="card">
+            <div class="card-body">
+                <button type="button" class="btn btn-primary btn-sm" style="margin-bottom: 3px;"
+                    (click)="openModalRemarks(createRemarks)"><i class="fa fa-pencil-square-o"></i> Write</button>
+                <div class="table-responsive">
+                    <table class="table table-hover table-sm">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Remarks</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let o of remarks">
+                                <td>{{ o.logDate | date: 'yyyy-MM-dd' }}</td>
+                                <td>{{ o.remarks }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<!-- <ng-template #ipModal>
+    <div class="modal-header">
+        <h4 class="modal-title" id="modal-basic-title">Incoming Payment</h4>
+        <button type="button" class="close" aria-label="close" (click)="closeModal()">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <strong>Incoming Payment Details (IP. No. {{ ipNo }})</strong>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover-sm">
+                    <thead>
+                        <tr>
+                            <th>Cash Sum</th>
+                            <th>Check Sum</th>
+                            <th>Transfer Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let i of ipDetails">
+                            <td> {{ i.cashSum }} </td>
+                            <td> {{ i.checkSum }} </td>
+                            <td> {{ i.trsfrSum }} </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</ng-template> -->

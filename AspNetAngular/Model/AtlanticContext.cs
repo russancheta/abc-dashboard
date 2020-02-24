@@ -18,6 +18,8 @@ namespace AspNetAngular.Model
         public virtual DbQuery<ARIPMonitoring> ARIPMonitoring { get; set; }
         public virtual DbQuery<ARIPDetails> ARIPDetails { get; set; }
         public virtual DbQuery<IPDetails> IPDetails { get; set; }
+        public virtual DbQuery<DepositDetails> DepositDetails { get; set; }
+        public virtual DbQuery<ARIPDepDifference> ARIPDepDifference { get; set; }
         public virtual DbQuery<ProductionOrder> ProductionOrder { get; set; }
         public virtual DbQuery<ProdOrderDetails> ProdOrderDetails { get; set; }
         public virtual DbQuery<InvTransferDetails> InvTransferDetails { get; set; }
@@ -35,5 +37,6 @@ namespace AspNetAngular.Model
         public virtual DbQuery<Branches> Branches { get; set; }
         public virtual DbQuery<FilterITR> FilterITR { get; set; }
         public virtual DbQuery<Locations> Locations { get; set; }
+        public virtual DbQuery<CustomerGroup> CustomerGroup { get; set; }
     }
 }
