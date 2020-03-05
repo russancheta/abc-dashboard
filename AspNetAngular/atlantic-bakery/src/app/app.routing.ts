@@ -13,6 +13,15 @@ import { ProductionOrderComponent } from './views/production-order/production-or
 import { ForProductionComponent } from './views/for-production/for-production.component';
 import { ArIpComponent } from './views/ar-ip/ar-ip.component';
 import { AccountsComponent } from './views/account/account.component';
+import { ChangePasswordComponent } from './views/changepassword/changepassword.component';
+
+import { AuthGuard } from './_guards/auth.guard';
+import { ModuleGuard } from './_guards/module.guard';
+import { AccountsGuard } from './_guards/account.guard';
+import { PMGuard } from './_guards/pm.guard';
+import { ITRMGuard } from './_guards/itrm.guard';
+import { ARMGuard } from './_guards/arm.guard';
+import { LoginGuard } from './_guards/login.guard';
 
 export const routes: Routes = [
   {
@@ -36,6 +45,7 @@ export const routes: Routes = [
   },
   {
     path: 'login',
+    canActivate: [LoginGuard],
     component: LoginComponent,
     data: {
       title: 'Login Page'
@@ -51,6 +61,7 @@ export const routes: Routes = [
   {
     path: '',
     component: DefaultLayoutComponent,
+    canActivate: [AuthGuard],
     data: {
       title: 'Home'
     },
@@ -65,6 +76,7 @@ export const routes: Routes = [
       {
         path: 'production-order',
         component: ProductionOrderComponent,
+        canActivate: [ITRMGuard],
         data: {
           title: 'ITR/IT Monitoring'
         }
@@ -72,6 +84,7 @@ export const routes: Routes = [
       {
         path: 'for-production',
         component: ForProductionComponent,
+        canActivate: [PMGuard],
         data: {
           title: 'Production Monitoring'
         }
@@ -79,6 +92,7 @@ export const routes: Routes = [
       {
         path: 'ar-ip',
         component: ArIpComponent,
+        canActivate: [ARMGuard],
         data: {
           title: 'AR/IP Monitoring'
         }
@@ -86,8 +100,17 @@ export const routes: Routes = [
       {
         path: 'account',
         component: AccountsComponent,
+        canActivate: [AccountsGuard],
         data: {
           title: 'Account'
+        }
+      },
+      {
+        path: 'changepassword',
+        component: ChangePasswordComponent,
+        canActivate: [AuthGuard],
+        data: {
+          title: 'Change Password'
         }
       },
       {

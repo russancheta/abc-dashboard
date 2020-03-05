@@ -10,11 +10,15 @@ namespace AspNetAngular.Model
         public bool PM { get; set; }
         public bool PMRemarks { get; set; }
         public bool PMPick { get; set; }
+        public bool PMGenerate { get; set; }
         public bool ITRM { get; set; }
         public bool ITRMRemarks { get; set; }
         public bool ITRMPick { get; set; }
+        public bool ITRMGenerate { get; set; }
         public bool ARM { get; set; }
         public bool ARMRemarks { get; set; }
         public bool ARMPick { get; set; }
+        public bool ARMGenerate { get; set; }
+
     }
 }

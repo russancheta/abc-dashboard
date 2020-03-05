@@ -83,7 +83,7 @@ export class Service {
     /**
      * @return Success
      */
-    accountAll(email: string): Observable<Account[]> {
+    account(email: string): Observable<Account[]> {
         let url_ = this.baseUrl + "/api/Account/searchUser{email}";
         if (email === undefined || email === null)
             throw new Error("The parameter 'email' must be defined.");
@@ -99,11 +99,11 @@ export class Service {
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processAccountAll(response_);
+            return this.processAccount(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processAccountAll(<any>response_);
+                    return this.processAccount(<any>response_);
                 } catch (e) {
                     return <Observable<Account[]>><any>_observableThrow(e);
                 }
@@ -112,7 +112,7 @@ export class Service {
         }));
     }
 
-    protected processAccountAll(response: HttpResponseBase): Observable<Account[]> {
+    protected processAccount(response: HttpResponseBase): Observable<Account[]> {
         const status = response.status;
         const responseBlob = 
             response instanceof HttpResponse ? response.body : 
@@ -196,8 +196,8 @@ export class Service {
      * @param body (optional) 
      * @return Success
      */
-    account(body: RegistrationViewModel | undefined): Observable<ResultReponser> {
-        let url_ = this.baseUrl + "/api/Account";
+    register(body: RegistrationViewModel | undefined): Observable<ResultReponser> {
+        let url_ = this.baseUrl + "/api/Account/register";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(body);
@@ -213,11 +213,11 @@ export class Service {
         };
 
         return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processAccount(response_);
+            return this.processRegister(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processAccount(<any>response_);
+                    return this.processRegister(<any>response_);
                 } catch (e) {
                     return <Observable<ResultReponser>><any>_observableThrow(e);
                 }
@@ -226,7 +226,7 @@ export class Service {
         }));
     }
 
-    protected processAccount(response: HttpResponseBase): Observable<ResultReponser> {
+    protected processRegister(response: HttpResponseBase): Observable<ResultReponser> {
         const status = response.status;
         const responseBlob = 
             response instanceof HttpResponse ? response.body : 
@@ -478,7 +478,7 @@ export class Service {
      * @return Success
      */
     getARIP(branch: string | undefined): Observable<ARIPMonitoring[]> {
-        let url_ = this.baseUrl + "/api/controll/getARIP?";
+        let url_ = this.baseUrl + "/api/controllers/getARIP?";
         if (branch === null)
             throw new Error("The parameter 'branch' cannot be null.");
         else if (branch !== undefined)
@@ -537,8 +537,8 @@ export class Service {
      * @param docNum (optional) 
      * @return Success
      */
-    getARIPDetails(docNum: number | undefined): Observable<ARIPDetails[]> {
-        let url_ = this.baseUrl + "/api/controll/getARIPDetails?";
+    getARDetails(docNum: number | undefined): Observable<ARIPDetails[]> {
+        let url_ = this.baseUrl + "/api/controllers/getARDetails?";
         if (docNum === null)
             throw new Error("The parameter 'docNum' cannot be null.");
         else if (docNum !== undefined)
@@ -554,11 +554,11 @@ export class Service {
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetARIPDetails(response_);
+            return this.processGetARDetails(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processGetARIPDetails(<any>response_);
+                    return this.processGetARDetails(<any>response_);
                 } catch (e) {
                     return <Observable<ARIPDetails[]>><any>_observableThrow(e);
                 }
@@ -567,7 +567,7 @@ export class Service {
         }));
     }
 
-    protected processGetARIPDetails(response: HttpResponseBase): Observable<ARIPDetails[]> {
+    protected processGetARDetails(response: HttpResponseBase): Observable<ARIPDetails[]> {
         const status = response.status;
         const responseBlob = 
             response instanceof HttpResponse ? response.body : 
@@ -598,7 +598,7 @@ export class Service {
      * @return Success
      */
     getIPDetails(docNum: number | undefined): Observable<IPDetails[]> {
-        let url_ = this.baseUrl + "/api/controll/getIPDetails?";
+        let url_ = this.baseUrl + "/api/controllers/getIPDetails?";
         if (docNum === null)
             throw new Error("The parameter 'docNum' cannot be null.");
         else if (docNum !== undefined)
@@ -658,7 +658,7 @@ export class Service {
      * @return Success
      */
     getDepositDetails(docNum: number | undefined): Observable<DepositDetails[]> {
-        let url_ = this.baseUrl + "/api/controll/getDepositDetails?";
+        let url_ = this.baseUrl + "/api/controllers/getDepositDetails?";
         if (docNum === null)
             throw new Error("The parameter 'docNum' cannot be null.");
         else if (docNum !== undefined)
@@ -718,7 +718,7 @@ export class Service {
      * @return Success
      */
     getARIPDepDifference(docEntry: number | undefined): Observable<ARIPDepDifference[]> {
-        let url_ = this.baseUrl + "/api/controll/getARIPDepDifference?";
+        let url_ = this.baseUrl + "/api/controllers/getARIPDepDifference?";
         if (docEntry === null)
             throw new Error("The parameter 'docEntry' cannot be null.");
         else if (docEntry !== undefined)
@@ -774,11 +774,71 @@ export class Service {
     }
 
     /**
+     * @param docNum (optional) 
+     * @return Success
+     */
+    getCSDepDifference(docNum: number | undefined): Observable<CSDepDifference[]> {
+        let url_ = this.baseUrl + "/api/controllers/getCSDepDifference?";
+        if (docNum === null)
+            throw new Error("The parameter 'docNum' cannot be null.");
+        else if (docNum !== undefined)
+            url_ += "docNum=" + encodeURIComponent("" + docNum) + "&"; 
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetCSDepDifference(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetCSDepDifference(<any>response_);
+                } catch (e) {
+                    return <Observable<CSDepDifference[]>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<CSDepDifference[]>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetCSDepDifference(response: HttpResponseBase): Observable<CSDepDifference[]> {
+        const status = response.status;
+        const responseBlob = 
+            response instanceof HttpResponse ? response.body : 
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200.push(CSDepDifference.fromJS(item));
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<CSDepDifference[]>(<any>null);
+    }
+
+    /**
      * @param body (optional) 
      * @return Success
      */
     insertARMRemarks(body: ARMRemarks | undefined): Observable<ResultReponser> {
-        let url_ = this.baseUrl + "/api/controll/insertARMRemarks";
+        let url_ = this.baseUrl + "/api/controllers/insertARMRemarks";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(body);
@@ -834,7 +894,7 @@ export class Service {
      * @return Success
      */
     getARMRemarks(arNo: number | undefined): Observable<ARMRemarks[]> {
-        let url_ = this.baseUrl + "/api/controll/getARMRemarks?";
+        let url_ = this.baseUrl + "/api/controllers/getARMRemarks?";
         if (arNo === null)
             throw new Error("The parameter 'arNo' cannot be null.");
         else if (arNo !== undefined)
@@ -887,6 +947,62 @@ export class Service {
             }));
         }
         return _observableOf<ARMRemarks[]>(<any>null);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    updateAR(body: number[] | undefined): Observable<ResultReponser> {
+        let url_ = this.baseUrl + "/api/controllers/updateAR";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json", 
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processUpdateAR(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processUpdateAR(<any>response_);
+                } catch (e) {
+                    return <Observable<ResultReponser>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<ResultReponser>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processUpdateAR(response: HttpResponseBase): Observable<ResultReponser> {
+        const status = response.status;
+        const responseBlob = 
+            response instanceof HttpResponse ? response.body : 
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ResultReponser.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<ResultReponser>(<any>null);
     }
 
     /**
@@ -2597,6 +2713,9 @@ export class RegistrationViewModel implements IRegistrationViewModel {
     itrm?: boolean;
     itrmRemarks?: boolean;
     itrmPick?: boolean;
+    arm?: boolean;
+    armRemarks?: boolean;
+    armPick?: boolean;
     location?: string[];
     role?: string;
 
@@ -2622,6 +2741,9 @@ export class RegistrationViewModel implements IRegistrationViewModel {
             this.itrm = data["itrm"];
             this.itrmRemarks = data["itrmRemarks"];
             this.itrmPick = data["itrmPick"];
+            this.arm = data["arm"];
+            this.armRemarks = data["armRemarks"];
+            this.armPick = data["armPick"];
             if (Array.isArray(data["location"])) {
                 this.location = [] as any;
                 for (let item of data["location"])
@@ -2651,6 +2773,9 @@ export class RegistrationViewModel implements IRegistrationViewModel {
         data["itrm"] = this.itrm;
         data["itrmRemarks"] = this.itrmRemarks;
         data["itrmPick"] = this.itrmPick;
+        data["arm"] = this.arm;
+        data["armRemarks"] = this.armRemarks;
+        data["armPick"] = this.armPick;
         if (Array.isArray(this.location)) {
             data["location"] = [];
             for (let item of this.location)
@@ -2673,6 +2798,9 @@ export interface IRegistrationViewModel {
     itrm?: boolean;
     itrmRemarks?: boolean;
     itrmPick?: boolean;
+    arm?: boolean;
+    armRemarks?: boolean;
+    armPick?: boolean;
     location?: string[];
     role?: string;
 }
@@ -2686,9 +2814,15 @@ export class AccountViewModel implements IAccountViewModel {
     pm?: boolean;
     pmRemarks?: boolean;
     pmPick?: boolean;
+    pmGenerate?: boolean;
     itrm?: boolean;
     itrmRemarks?: boolean;
     itrmPick?: boolean;
+    itrmGenerate?: boolean;
+    arm?: boolean;
+    armRemarks?: boolean;
+    armPick?: boolean;
+    armGenerate?: boolean;
     role?: string;
     locationAdd?: string[];
     locationDelete?: string[];
@@ -2712,9 +2846,15 @@ export class AccountViewModel implements IAccountViewModel {
             this.pm = data["pm"];
             this.pmRemarks = data["pmRemarks"];
             this.pmPick = data["pmPick"];
+            this.pmGenerate = data["pmGenerate"];
             this.itrm = data["itrm"];
             this.itrmRemarks = data["itrmRemarks"];
             this.itrmPick = data["itrmPick"];
+            this.itrmGenerate = data["itrmGenerate"];
+            this.arm = data["arm"];
+            this.armRemarks = data["armRemarks"];
+            this.armPick = data["armPick"];
+            this.armGenerate = data["armGenerate"];
             this.role = data["role"];
             if (Array.isArray(data["locationAdd"])) {
                 this.locationAdd = [] as any;
@@ -2746,9 +2886,15 @@ export class AccountViewModel implements IAccountViewModel {
         data["pm"] = this.pm;
         data["pmRemarks"] = this.pmRemarks;
         data["pmPick"] = this.pmPick;
+        data["pmGenerate"] = this.pmGenerate;
         data["itrm"] = this.itrm;
         data["itrmRemarks"] = this.itrmRemarks;
         data["itrmPick"] = this.itrmPick;
+        data["itrmGenerate"] = this.itrmGenerate;
+        data["arm"] = this.arm;
+        data["armRemarks"] = this.armRemarks;
+        data["armPick"] = this.armPick;
+        data["armGenerate"] = this.armGenerate;
         data["role"] = this.role;
         if (Array.isArray(this.locationAdd)) {
             data["locationAdd"] = [];
@@ -2773,9 +2919,15 @@ export interface IAccountViewModel {
     pm?: boolean;
     pmRemarks?: boolean;
     pmPick?: boolean;
+    pmGenerate?: boolean;
     itrm?: boolean;
     itrmRemarks?: boolean;
     itrmPick?: boolean;
+    itrmGenerate?: boolean;
+    arm?: boolean;
+    armRemarks?: boolean;
+    armPick?: boolean;
+    armGenerate?: boolean;
     role?: string;
     locationAdd?: string[];
     locationDelete?: string[];
@@ -2868,14 +3020,17 @@ export class ARIPMonitoring implements IARIPMonitoring {
     cardName?: string;
     ipNo?: string;
     depositNo?: string;
-    status?: string;
+    aripStatus?: string;
+    csDepStatus?: string;
     docTotal?: number;
     paidSum?: number;
     totalPayment?: number;
+    checkSum?: number;
     totalDeposit?: number;
     docEntry?: number;
     remarks?: string;
     groupname?: string;
+    remarksCount?: number;
 
     constructor(data?: IARIPMonitoring) {
         if (data) {
@@ -2894,14 +3049,17 @@ export class ARIPMonitoring implements IARIPMonitoring {
             this.cardName = data["cardName"];
             this.ipNo = data["ipNo"];
             this.depositNo = data["depositNo"];
-            this.status = data["status"];
+            this.aripStatus = data["aripStatus"];
+            this.csDepStatus = data["csDepStatus"];
             this.docTotal = data["docTotal"];
             this.paidSum = data["paidSum"];
             this.totalPayment = data["totalPayment"];
+            this.checkSum = data["checkSum"];
             this.totalDeposit = data["totalDeposit"];
             this.docEntry = data["docEntry"];
             this.remarks = data["remarks"];
             this.groupname = data["groupname"];
+            this.remarksCount = data["remarksCount"];
         }
     }
 
@@ -2920,14 +3078,17 @@ export class ARIPMonitoring implements IARIPMonitoring {
         data["cardName"] = this.cardName;
         data["ipNo"] = this.ipNo;
         data["depositNo"] = this.depositNo;
-        data["status"] = this.status;
+        data["aripStatus"] = this.aripStatus;
+        data["csDepStatus"] = this.csDepStatus;
         data["docTotal"] = this.docTotal;
         data["paidSum"] = this.paidSum;
         data["totalPayment"] = this.totalPayment;
+        data["checkSum"] = this.checkSum;
         data["totalDeposit"] = this.totalDeposit;
         data["docEntry"] = this.docEntry;
         data["remarks"] = this.remarks;
         data["groupname"] = this.groupname;
+        data["remarksCount"] = this.remarksCount;
         return data; 
     }
 }
@@ -2939,14 +3100,17 @@ export interface IARIPMonitoring {
     cardName?: string;
     ipNo?: string;
     depositNo?: string;
-    status?: string;
+    aripStatus?: string;
+    csDepStatus?: string;
     docTotal?: number;
     paidSum?: number;
     totalPayment?: number;
+    checkSum?: number;
     totalDeposit?: number;
     docEntry?: number;
     remarks?: string;
     groupname?: string;
+    remarksCount?: number;
 }
 
 export class ARIPDetails implements IARIPDetails {
@@ -3166,6 +3330,46 @@ export interface IARIPDepDifference {
     docTotal?: number;
     paidSum?: number;
     totalPayment?: number;
+    totalDeposit?: number;
+}
+
+export class CSDepDifference implements ICSDepDifference {
+    checkSum?: number;
+    totalDeposit?: number;
+
+    constructor(data?: ICSDepDifference) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            this.checkSum = data["checkSum"];
+            this.totalDeposit = data["totalDeposit"];
+        }
+    }
+
+    static fromJS(data: any): CSDepDifference {
+        data = typeof data === 'object' ? data : {};
+        let result = new CSDepDifference();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["checkSum"] = this.checkSum;
+        data["totalDeposit"] = this.totalDeposit;
+        return data; 
+    }
+}
+
+export interface ICSDepDifference {
+    checkSum?: number;
     totalDeposit?: number;
 }
 
@@ -3615,6 +3819,7 @@ export class ProductionForecast implements IProductionForecast {
     status?: string;
     docRemarks?: string;
     docEntry?: number;
+    remarksCount?: number;
 
     constructor(data?: IProductionForecast) {
         if (data) {
@@ -3636,6 +3841,7 @@ export class ProductionForecast implements IProductionForecast {
             this.status = data["status"];
             this.docRemarks = data["docRemarks"];
             this.docEntry = data["docEntry"];
+            this.remarksCount = data["remarksCount"];
         }
     }
 
@@ -3657,6 +3863,7 @@ export class ProductionForecast implements IProductionForecast {
         data["status"] = this.status;
         data["docRemarks"] = this.docRemarks;
         data["docEntry"] = this.docEntry;
+        data["remarksCount"] = this.remarksCount;
         return data; 
     }
 }
@@ -3671,6 +3878,7 @@ export interface IProductionForecast {
     status?: string;
     docRemarks?: string;
     docEntry?: number;
+    remarksCount?: number;
 }
 
 export class ProductionForecastDetails implements IProductionForecastDetails {
@@ -3722,6 +3930,7 @@ export class SQGRDifference implements ISQGRDifference {
     dscription?: string;
     sqQuantity?: number;
     grQuantity?: number;
+    variance?: number;
 
     constructor(data?: ISQGRDifference) {
         if (data) {
@@ -3738,6 +3947,7 @@ export class SQGRDifference implements ISQGRDifference {
             this.dscription = data["dscription"];
             this.sqQuantity = data["sqQuantity"];
             this.grQuantity = data["grQuantity"];
+            this.variance = data["variance"];
         }
     }
 
@@ -3754,6 +3964,7 @@ export class SQGRDifference implements ISQGRDifference {
         data["dscription"] = this.dscription;
         data["sqQuantity"] = this.sqQuantity;
         data["grQuantity"] = this.grQuantity;
+        data["variance"] = this.variance;
         return data; 
     }
 }
@@ -3763,6 +3974,7 @@ export interface ISQGRDifference {
     dscription?: string;
     sqQuantity?: number;
     grQuantity?: number;
+    variance?: number;
 }
 
 export class ITRNos implements IITRNos {
@@ -3863,6 +4075,7 @@ export class ProductionOrder implements IProductionOrder {
     status?: string;
     docRemarks?: string;
     group?: string;
+    remarksCount?: number;
 
     constructor(data?: IProductionOrder) {
         if (data) {
@@ -3884,6 +4097,7 @@ export class ProductionOrder implements IProductionOrder {
             this.status = data["status"];
             this.docRemarks = data["docRemarks"];
             this.group = data["group"];
+            this.remarksCount = data["remarksCount"];
         }
     }
 
@@ -3905,6 +4119,7 @@ export class ProductionOrder implements IProductionOrder {
         data["status"] = this.status;
         data["docRemarks"] = this.docRemarks;
         data["group"] = this.group;
+        data["remarksCount"] = this.remarksCount;
         return data; 
     }
 }
@@ -3919,6 +4134,7 @@ export interface IProductionOrder {
     status?: string;
     docRemarks?: string;
     group?: string;
+    remarksCount?: number;
 }
 
 export class FilterITR implements IFilterITR {
@@ -4086,6 +4302,7 @@ export class ITRITDifference implements IITRITDifference {
     dscription?: string;
     itrQuantity?: number;
     itQuantity?: number;
+    variance?: number;
 
     constructor(data?: IITRITDifference) {
         if (data) {
@@ -4102,6 +4319,7 @@ export class ITRITDifference implements IITRITDifference {
             this.dscription = data["dscription"];
             this.itrQuantity = data["itrQuantity"];
             this.itQuantity = data["itQuantity"];
+            this.variance = data["variance"];
         }
     }
 
@@ -4118,6 +4336,7 @@ export class ITRITDifference implements IITRITDifference {
         data["dscription"] = this.dscription;
         data["itrQuantity"] = this.itrQuantity;
         data["itQuantity"] = this.itQuantity;
+        data["variance"] = this.variance;
         return data; 
     }
 }
@@ -4127,6 +4346,7 @@ export interface IITRITDifference {
     dscription?: string;
     itrQuantity?: number;
     itQuantity?: number;
+    variance?: number;
 }
 
 export class ITRMRemarks implements IITRMRemarks {

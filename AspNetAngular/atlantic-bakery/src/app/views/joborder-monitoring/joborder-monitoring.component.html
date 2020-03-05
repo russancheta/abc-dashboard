@@ -3,7 +3,7 @@
         <div class="col-md-4">
             <div class="form-group">
                 <label>Choose Branch</label>
-                <select class="form-control" (change)="onChangeBranch($event.target.value)">
+                <select class="form-control">
                     <option *ngFor="let b of branches">
                         {{ b.name }}
                     </option>

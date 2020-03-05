@@ -72,8 +72,8 @@ namespace AspNetAngular.Controllers
                         auth_token = await _jwtFactory.GenerateEncodedToken(credentials.UserName, identity),
                         expires_in = (int)_jwtOptions.ValidFor.TotalSeconds,
                         role = roles.FirstOrDefault(),
-                        // FullName = user.LastName + ", " + user.FirstName + " " + user.MiddleName[0] + ".",
-                        FullName = user.FirstName,
+                        FullName = user.FirstName + " " + user.LastName,
+                        // FullName = user.FirstName,
                         user = user
                     };
                     return new ResultReponser
@@ -88,7 +88,7 @@ namespace AspNetAngular.Controllers
             {
                 return new ResultReponser
                 {
-                    Result = "failed",
+                    Result = "Failed",
                     Message = "Incorrect username or Password",
                     ResponseData = ""
                 };

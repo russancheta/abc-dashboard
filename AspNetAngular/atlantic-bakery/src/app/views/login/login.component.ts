@@ -60,14 +60,38 @@ export class LoginComponent implements OnInit {
     credential.userName = this.f.username.value;
     credential.password = this.f.password.value;
     this.apiService.login(credential).subscribe(response => {
-      if (response.result == 'Success') {
+      if (response.result == 'success') {
         localStorage.setItem('currentUser', JSON.stringify(response.responseData));
         if (this.authService.getUserType() == 'Super Admin') {
-          this.router.navigate(['accounts']);
+          this.router.navigate(['account']);
         }
-        // to add routing for other roles
-      }
-    })
+        else if (
+          this.authService.getCurrentUser().role == 'Admin' ||
+          this.authService.getCurrentUser().role == 'Super User'
+        ) {
+          this.router.navigate(['dashboard']);
+        }
 
+        const toast = Swal.mixin({
+          toast: true,
+          position: 'top-end',
+          showConfirmButton: false,
+          timer: 3000
+        });
+
+        toast.fire({
+          type: 'success',
+          title: 'Signed in successfully'
+        });
+      } else {
+        this.error = response.message;
+      }
+      this.loading = false;
+    },
+      error => {
+        this.error = error;
+        this.loading = false;
+      }
+    );
   }
- }
+}

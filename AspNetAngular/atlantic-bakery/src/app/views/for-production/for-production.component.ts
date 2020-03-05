@@ -10,6 +10,10 @@ import { AuthService } from '../../shared/auth.service';
 import Swal from 'sweetalert2';
 import { interval } from 'rxjs/internal/observable/interval';
 import { startWith, flatMap } from 'rxjs/operators';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { NgbDateStruct, NgbCalendar } from '@ng-bootstrap/ng-bootstrap';
+import { ReportService } from '../../shared/report.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-for-production',
@@ -84,15 +88,40 @@ export class ForProductionComponent implements OnInit {
   ];
   filterAll: string = 'All';
 
+  // Report
+  reportLocation = 'All';
+  reportTypeSelection = [
+    { value: 'type1', label: 'Production Monitoring Logs'},
+    { value: 'type2', label: 'Production Monitoring Unpicked'}
+  ];
+  reportType = 'type1';
+  branchReport = 'All';
+  report2filterOptionSelected = 'All';
+
+  // Date picker
+  formReport: FormGroup;
+  dtp1MaxDate: NgbDateStruct;
+  dtp2MinDate: NgbDateStruct;
+
   constructor(
     private apiService: Service,
     private modalService: BsModalService,
-    public authService: AuthService
+    public authService: AuthService,
+    private formBuilder: FormBuilder,
+    private reportService: ReportService,
+    private calendar: NgbCalendar
   ) { }
 
   ngOnInit() {
     this.getBranches();
-    // this.getProdForecast(this.branches[0].name);
+    this.formReport = this.formBuilder.group({
+      dtp1: [null, [Validators.required]],
+      dtp2: [null, [Validators.required]]
+    });
+    this.formReport.setValue({
+      dtp1: this.calendar.getToday(),
+      dtp2: this.calendar.getToday()
+    });
   }
 
   getITRCompareSQ(itrNo: string) {
@@ -119,7 +148,6 @@ export class ForProductionComponent implements OnInit {
   getGoodsIssueDetails(docNum: number) {
     this.apiService.getIssueProdDetails(docNum).subscribe(response => {
       this.goodsIssueDetails = response;
-      console.table(response);
     });
   }
 
@@ -165,7 +193,6 @@ export class ForProductionComponent implements OnInit {
   }
 
   sqDetails(content: any, sqNo: number, itrNo: string) {
-    console.log(itrNo);
     this.itrNo = itrNo;
     this.getProdForecastDetails(sqNo);
     this.getITRCompareSQ(itrNo);
@@ -175,13 +202,13 @@ export class ForProductionComponent implements OnInit {
 
   giDetails(content: any, giNo: number) {
     this.getGoodsIssueDetails(giNo);
-    this.modalRef = this.modalService.show(content, { backdrop: 'static', class: 'modal-xl' });
+    this.modalRef = this.modalService.show(content, { backdrop: 'static', class: 'modal-lg' });
     this.sqNo = giNo;
   }
 
   grDetails(content: any, grNo: number) {
     this.getGoodsReceiptDetails(grNo);
-    this.modalRef = this.modalService.show(content, { backdrop: 'static', class: 'modal-xl' });
+    this.modalRef = this.modalService.show(content, { backdrop: 'static', class: 'modal-lg' });
     this.grNo = grNo.toString();
   }
 
@@ -190,7 +217,6 @@ export class ForProductionComponent implements OnInit {
       this.sumGoodsReceiptDetails = response;
       this.sqQuantityTotal = response.reduce((r, d) => r + d.sqQuantity, 0);
       this.grQuantityTotal = response.reduce((r, d) => r + d.grQuantity, 0);
-      console.table(response);
     });
     this.modalRef = this.modalService.show(content, { backdrop: 'static', class: 'modal-lg' })
   }
@@ -231,9 +257,6 @@ export class ForProductionComponent implements OnInit {
             );
             this.selectedSQ = new Array();
             this.getProdForecast(this.branch);
-            console.log(this.selectedSQ);
-            console.log(response.result);
-            console.log(response.message);
           }
         });
       }
@@ -244,7 +267,7 @@ export class ForProductionComponent implements OnInit {
     this.submitBtn = true;
     const pmRemarks = new PMRemarks();
     pmRemarks.logDate = new Date();
-    pmRemarks.logName = 'test';//this.authService.getCurrentUser().fullName;
+    pmRemarks.logName = this.authService.getCurrentUser().fullName;
     pmRemarks.remarks = this.remarksMessage;
     pmRemarks.sqNo = this.sqNo;
     this.apiService.insertPMRemarks(pmRemarks).subscribe(response => {
@@ -252,6 +275,7 @@ export class ForProductionComponent implements OnInit {
         this.getRemarks(this.sqNo);
         this.remarksMessage = '';
         this.submitBtn = false;
+        this.closeModalRemarks();
       }
     }, error => {
       this.submitBtn = false;
@@ -268,15 +292,13 @@ export class ForProductionComponent implements OnInit {
     })
   }
 
-  updateRemarks(remarks: string, sqNo: number){
-    
-  }
-
   closeModal() {
+    this.getProdForecast(this.branch);
     this.modalRef.hide();
   }
 
   closeModalRemarks() {
+    this.getProdForecast(this.branch);
     this.modalRefRemarks.hide();
   }
 
@@ -297,6 +319,23 @@ export class ForProductionComponent implements OnInit {
     }
   }
 
+  onSelectReportType(type: string) {
+    this.reportType = type;
+  }
+
+  onChangeBranchReport(branch: string) {
+    this.branchReport = branch;
+  }
+
+  onChangeReportFilterStatus(status: string) {
+    this.report2filterOptionSelected = status;
+  }
+
+  onChangeDpt() {
+    this.dtp1MaxDate = this.formReport.controls.dtp2.value;
+    this.dtp2MinDate = this.formReport.controls.dtp1.value;
+  }
+
   openModalListRemarks(content: any, sqNo: number) {
     this.sqNo = sqNo;
     this.getRemarks(sqNo);
@@ -304,8 +343,52 @@ export class ForProductionComponent implements OnInit {
   }
 
   openModalRemarks(content: any) {
-    console.log('Open Modal Remarks');
     this.modalRefRemarks = this.modalService.show(content, { backdrop: 'static' });
+  }
+
+  openReportModal(content: any) {
+    this.reportType = 'type1';
+    this.modalRef = this.modalService.show(content, { backdrop: 'static' });
+  }
+
+  viewReport() {
+    const eBranch = this.reportService.setEncryptedData(this.branchReport);
+    if (this.reportType == 'type1') {
+      const dtp1year = this.formReport.controls.dtp1.value.year;
+      const dtp1month = this.formReport.controls.dtp1.value.month;
+      const dtp1day = this.formReport.controls.dtp1.value.day;
+      const dtp1 = dtp1year + '-' + dtp1month + '-' + dtp1day;
+
+      const dtp2year = this.formReport.controls.dtp2.value.year;
+      const dtp2month = this.formReport.controls.dtp2.value.month;
+      const dtp2day = this.formReport.controls.dtp2.value.day;
+      const dtp2 = dtp2year + '-' + dtp2month + '-' + dtp2day;
+
+      const eFromDate = this.reportService.setEncryptedData(dtp1);
+      const eToDate = this.reportService.setEncryptedData(dtp2);
+
+      window.open(
+        environment.REPORT_BASE_URL + '/Report/PMLogs?'
+        + 'from=' + eFromDate + '&to=' + eToDate + '&branch=' + eBranch, '_blank'
+      );
+    } else if (this.reportType == 'type2') {
+      const eStatus = this.reportService.setEncryptedData(this.report2filterOptionSelected);
+      window.open(
+        environment.REPORT_BASE_URL + '/Report/PMUnpicked?'
+        + 'branch=' + eBranch + '&status=' + eStatus, '_blank'
+      );
+    }
+  }
+
+  // table color if short, over or equal
+  tableColor(variance: number) {
+    if (variance < 0) {
+      return 'table-warning';
+    } else if (variance > 0) {
+      return 'table-success';
+    } else {
+      return '';
+    }
   }
 
   showLoading() {

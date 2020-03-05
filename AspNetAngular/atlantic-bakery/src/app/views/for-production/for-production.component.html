@@ -19,6 +19,14 @@
                 </select>
             </div>
         </div>
+        <div class="col-md-2">
+
+        </div>
+        <div class="col-md-2">
+            <ng-template [ngIf]="authService.getCurrentUser().user.pmGenerate == true">
+                <button type="button" class="btn btn-primary" (click)="openReportModal(reportModal)">View Report</button>
+            </ng-template>
+        </div>
     </div>
     <ngb-tabset>
         <ngb-tab>
@@ -41,15 +49,17 @@
                                 <th>GR No.</th>
                                 <th>Status</th>
                                 <th class="text-center">Remarks</th>
-                                <th>Pick</th>
+                                <ng-template [ngIf]="authService.getCurrentUser().user.pmPick == true">
+                                    <th>Pick</th>
+                                </ng-template>
                             </tr>
                         </thead>
                         <tbody>
                             <tr
                                 *ngFor="let o of returnPF | slice: (page-1) * pageSize : (page-1) * pageSize + pageSize">
-                                <td> {{ o.docDate | date: 'yyyy-MM-dd' }} </td>
+                                <td> {{ o.docDate | date: 'MM-dd-yyyy' }} </td>
                                 <td popover="Remarks: {{ o.docRemarks }}" triggers="mouseenter:mouseleave">
-                                    <button style="color: #2980b9" type="button" class="btn btn-link btn-sm"
+                                    <button style="color: #2980b9" type="button" class="btn btn-link btn-sm text-center"
                                         (click)="sqDetails(sqModal, o.docNum, o.itrNo)"> {{ o.docNum }}</button>
                                 </td>
                                 <td> {{ o.daysDue }} </td>
@@ -100,15 +110,19 @@
                                         (click)="sqGrDifference(sqgrModal, o.docEntry)"> {{ o.status }} </button>
                                 </td>
                                 <td class="text-center">
-                                    <button type="button" (click)="openModalListRemarks(remarksNotes,o.docNum)"><i
-                                            class="fa fa-pencil-square-o fa-lg"></i></button>
+                                    <button type="button" (click)="openModalListRemarks(remarksNotes,o.docNum)"
+                                        [ngClass]="o.remarksCount == 0 ? 'btn btn-link btn-sm text-danger' : 'btn btn-link btn-sm text-success'">
+                                        <i class="fa fa-pencil-square-o fa-lg"></i>
+                                    </button>
                                 </td>
-                                <td>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" 
-                                            (change)="checkedSQ(o.docNum)">
-                                    </div>
-                                </td>
+                                <ng-template [ngIf]="authService.getCurrentUser().user.pmPick == true">
+                                    <td>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" (change)="checkedSQ(o.docNum)"
+                                                [disabled]="o.remarksCount == 0">
+                                        </div>
+                                    </td>
+                                </ng-template>
                             </tr>
                         </tbody>
                     </table>
@@ -285,25 +299,27 @@
                         <tr>
                             <th>Item Code</th>
                             <th>Description</th>
-                            <th>SQ Quantity</th>
-                            <th>GR Quantity</th>
+                            <th class="text-center">SQ Quantity</th>
+                            <th class="text-center">GR Quantity</th>
+                            <th class="text-center">Variance</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr *ngFor="let i of sumGoodsReceiptDetails"
-                            [ngClass]="i.sqQuantity > i.grQuantity || i.grQuantity > i.sqQuantity ? 'table-warning' : '' ">
+                        <tr *ngFor="let i of sumGoodsReceiptDetails" [ngClass]="tableColor(i.variance)">
                             <td> {{ i.itemCode }} </td>
                             <td> {{ i.dscription }} </td>
-                            <td> {{ i.sqQuantity }} </td>
-                            <td> {{ i.grQuantity }} </td>
+                            <td class="text-center"> {{ i.sqQuantity }} </td>
+                            <td class="text-center"> {{ i.grQuantity }} </td>
+                            <td class="text-center"> {{ i.variance }} </td>
                         </tr>
                     </tbody>
                     <tfoot>
                         <tr>
                             <td></td>
                             <td></td>
-                            <td><span class="text-danger">{{ sqQuantityTotal }}</span></td>
-                            <td><span class="text-danger">{{ grQuantityTotal }}</span></td>
+                            <td class="text-center"><span class="text-danger">{{ sqQuantityTotal }}</span></td>
+                            <td class="text-center"><span class="text-danger">{{ grQuantityTotal }}</span></td>
+                            <td></td>
                         </tr>
                     </tfoot>
                 </table>
@@ -325,7 +341,7 @@
             </div>
             <div class="d-flex flex-row-reverse">
                 <button type="submit" class="btn btn-primary" [disabled]="submitBtn">Save <i *ngIf="submitBtn"
-                    class="fa fa-spinner fa-spin"></i></button>
+                        class="fa fa-spinner fa-spin"></i></button>
             </div>
         </form>
     </div>
@@ -353,7 +369,7 @@
                         </thead>
                         <tbody>
                             <tr *ngFor="let o of remarks">
-                                <td>{{ o.logDate | date: 'yyyy-MM-dd' }}</td>
+                                <td>{{ o.logDate | date: 'MM-dd-yyyy' }}</td>
                                 <td>{{ o.remarks }}</td>
                             </tr>
                         </tbody>
@@ -361,5 +377,73 @@
                 </div>
             </div>
         </div>
+    </div>
+</ng-template>
+
+<ng-template #reportModal let-modal>
+    <div class="modal-body">
+        <button type="button" class="close" aria-label="Close" (click)="closeModal()">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        <label><strong>Report Filter</strong></label>
+        <form [formGroup]="formReport">
+            <div class="form-group">
+                <label>
+                    Type
+                </label>
+                <select class="form-control" (change)="onSelectReportType($event.target.value)">
+                    <option *ngFor="let o of reportTypeSelection" [value]="o.value">
+                        {{ o.label }}
+                    </option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Branch</label>
+                <select class="form-control" (change)="onChangeBranchReport($event.target.value)">
+                    <option [value]="'All'">All</option>
+                    <option *ngFor="let b of branches">
+                        {{ b.name }}
+                    </option>
+                </select>
+            </div>
+            <ng-template [ngIf]="reportType == 'type2'">
+                <div class="form-group">
+                    <label>Status</label>
+                    <select class="form-control" [ngModel]="report2filterOptionSelected"
+                        [ngModelOptions]="{standalone: true}" (ngModelChange)="report2filterOptionSelected"
+                        (change)="onChangeReportFilterStatus($event.target.value)">
+                        <option *ngFor="let o of statusFilter" [value]="o.value"> {{ o.label }} </option>
+                    </select>
+                </div>
+            </ng-template>
+            <ng-template [ngIf]="reportType == 'type1'">
+                <div class="form-group">
+                    <label>From</label>
+                    <div class="input-group">
+                        <input class="form-control" placeholder="yyyy-mm-dd" ngbDatepicker #d1="ngbDatepicker"
+                            [maxDate]="dtp1MaxDate" formControlName="dtp1" (dateSelect)="onChangeDpt()">
+                        <span class="input-group-append">
+                            <button class="btn btn-secondary fa fa-calendar" (click)="d1.toggle()"
+                                type="button"></button>
+                        </span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>To</label>
+                    <div class="input-group">
+                        <input class="form-control" placeholder="yyyy-mm-dd" ngbDatepicker #d2="ngbDatepicker"
+                            [minDate]="dtp2MinDate" formControlName="dtp2" (dateSelect)="onChangeDpt()">
+                        <span class="input-group-append">
+                            <button class="btn btn-secondary fa fa-calendar" (click)="d2.toggle()"
+                                type="button"></button>
+                        </span>
+                    </div>
+                </div>
+            </ng-template>
+            <div class="d-flex flex-row-reverse">
+                <button type="button" class="btn btn-primary" (click)="viewReport()"
+                    [disabled]="!formReport.valid">Proceed</button>
+            </div>
+        </form>
     </div>
 </ng-template>

@@ -13,5 +13,6 @@ namespace AspNetAngular.Model
         public string Status { get; set; }
         public string DocRemarks { get; set; }
         public string Group { get; set; }
+        public int RemarksCount { get; set; }
     }
 }

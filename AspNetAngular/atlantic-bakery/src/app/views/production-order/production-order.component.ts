@@ -1,9 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { Service } from '../../core/api.client';
 import { ProductionOrder, ProdOrderDetails, InvTransferDetails, ITRITDifference, ITRMRemarks } from '../../core/api.client';
+import { AuthService } from '../../shared/auth.service';
 import { Branches } from '../../core/api.client';
 import { BsModalRef, BsModalService, ModalOptions } from 'ngx-bootstrap';
 import Swal from 'sweetalert2';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { NgbDateStruct, NgbCalendar } from '@ng-bootstrap/ng-bootstrap';
+import { ReportService } from '../../shared/report.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-production-order',
@@ -74,16 +79,42 @@ export class ProductionOrderComponent implements OnInit {
   fromBranch = '';
   status = '';
 
+  // Report
+  reportLocation = 'All';
+  reportTypeSelection = [
+    { value: 'type1', label: 'ITR/IT Monitoring Logs' },
+    { value: 'type2', label: 'ITR/IT Monitoring Unpicked' }
+  ];
+  reportType = 'type1';
+  branchReport = 'All';
+  report2filterOptionSelected = 'All';
+
+  // Date picker
+  formReport: FormGroup;
+  dtp1MaxDate: NgbDateStruct;
+  dtp2MinDate: NgbDateStruct;
+
   pollingData: any;
 
   constructor(
     private apiService: Service,
-    private modalService: BsModalService
+    private modalService: BsModalService,
+    public authService: AuthService,
+    private formBuilder: FormBuilder,
+    private reportService: ReportService,
+    private calendar: NgbCalendar
   ) { }
 
   ngOnInit() {
     this.getBranches();
-   
+    this.formReport = this.formBuilder.group({
+      dtp1: [null, [Validators.required]],
+      dtp2: [null, [Validators.required]]
+    });
+    this.formReport.setValue({
+      dtp1: this.calendar.getToday(),
+      dtp2: this.calendar.getToday()
+    })
   }
 
   getProductionOrder(branch: string) {
@@ -117,7 +148,7 @@ export class ProductionOrderComponent implements OnInit {
 
   openModal(content: any, itrNo: number) {
     this.getProdOrderDetails(itrNo);
-    this.modalRef = this.modalService.show(content, { backdrop: 'static', class: 'modal-xl' })
+    this.modalRef = this.modalService.show(content, { backdrop: 'static', class: 'modal-lg' })
     this.itrNo = itrNo;
   }
 
@@ -142,20 +173,74 @@ export class ProductionOrderComponent implements OnInit {
 
   openModalListRemarks(content: any, itrNo: number) {
     this.itrNo = itrNo;
+    this.getRemarks(itrNo);
     this.modalRef = this.modalService.show(content, { backdrop: 'static' });
   }
 
+  openReportModal(content: any) {
+    this.reportType = 'type1';
+    this.modalRef = this.modalService.show(content, { backdrop: 'static' });
+  }
+
+  viewReport() {
+    const eBranch = this.reportService.setEncryptedData(this.branchReport);
+    if (this.reportType == 'type1') {
+      const dtp1year = this.formReport.controls.dtp1.value.year;
+      const dtp1month = this.formReport.controls.dtp1.value.month;
+      const dtp1day = this.formReport.controls.dtp1.value.day;
+      const dtp1 = dtp1year + '-' + dtp1month + '-' + dtp1day;
+
+      const dtp2year = this.formReport.controls.dtp2.value.year;
+      const dtp2month = this.formReport.controls.dtp2.value.month;
+      const dtp2day = this.formReport.controls.dtp2.value.day;
+      const dtp2 = dtp2year + '-' + dtp2month + '-' + dtp2day;
+
+      const eFromDate = this.reportService.setEncryptedData(dtp1);
+      const eToDate = this.reportService.setEncryptedData(dtp2);
+
+      window.open(
+        environment.REPORT_BASE_URL + '/Report/ITRMLogs?'
+        + 'from=' + eFromDate + '&to=' + eToDate + '&branch=' + eBranch, '_blank'
+      );
+    } else if (this.reportType == 'type2') {
+      const eStatus = this.reportService.setEncryptedData(this.report2filterOptionSelected);
+      window.open(
+        environment.REPORT_BASE_URL + '/Report/ITRMUnpicked?'
+        + 'branch=' + eBranch + '&status=' + eStatus, '_blank'
+      );
+    }
+  }
+
   closeModalRemarks() {
+    this.getProductionOrder(this.branch);
     this.modalRefRemarks.hide();
   }
 
   closeModal() {
+    this.getProductionOrder(this.branch);
     this.modalRef.hide();
   }
 
   onChangeBranch(branch: string) {
     this.getProductionOrder(branch);
     this.branch = branch;
+  }
+
+  onSelectReportType(type: string) {
+    this.reportType = type;
+  }
+
+  onChangeBranchReport(branch: string) {
+    this.branchReport = branch;
+  }
+
+  onChangeReportFilterStatus(status: string) {
+    this.report2filterOptionSelected = status;
+  }
+
+  onChangeDpt() {
+    this.dtp1MaxDate = this.formReport.controls.dtp2.value;
+    this.dtp2MinDate = this.formReport.controls.dtp1.value;
   }
 
   showLoading() {
@@ -216,7 +301,6 @@ export class ProductionOrderComponent implements OnInit {
     this.status = selectedStatus;
     if (selectedStatus == 'All') {
       this.getProductionOrder(this.branch);
-      console.log(this.branch);
     } else {
       this.showLoading();
       this.returnPO = this.containerPO;
@@ -260,9 +344,6 @@ export class ProductionOrderComponent implements OnInit {
             );
             this.selectedITR = new Array();
             this.getProductionOrder(this.branch);
-            console.log(this.selectedITR);
-            console.log(response.result);
-            console.log(response.message);
           }
         });
       }
@@ -273,15 +354,15 @@ export class ProductionOrderComponent implements OnInit {
     this.submitBtn = true;
     const itrmRemarks = new ITRMRemarks();
     itrmRemarks.logDate = new Date();
-    itrmRemarks.logName = '';//this.authService.getCurrentUser().fullName;
+    itrmRemarks.logName = this.authService.getCurrentUser().fullName;
     itrmRemarks.remarks = this.remarksMessage;
     itrmRemarks.itrNo = this.itrNo;
-    console.log(itrmRemarks);
     this.apiService.insertITRMRemarks(itrmRemarks).subscribe(response => {
       if (response.result == 'success') {
         this.getRemarks(this.itrNo);
         this.remarksMessage = '';
         this.submitBtn = false;
+        this.closeModalRemarks();
       }
     }, error => {
       this.submitBtn = false;
@@ -295,5 +376,16 @@ export class ProductionOrderComponent implements OnInit {
     }, error => {
       console.log('HTTP error', error);
     })
+  }
+
+  // table color if short, over or equal
+  tableColor(variance: number) {
+    if (variance < 0) {
+      return 'table-warning';
+    } else if (variance > 0) {
+      return 'table-success';
+    } else {
+      return '';
+    }
   }
 }

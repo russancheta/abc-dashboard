@@ -6,10 +6,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using AspNetAngular.Model;
 using System.Data.SqlClient;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AspNetAngular.Controllers
 {
-    [Route("api/controll")]
+    [Authorize (Policy = "ApiUser")]
+    [Route("api/controllers")]
     [ApiController]
 
     public class ARIPMonit : ControllerBase
@@ -47,52 +49,76 @@ namespace AspNetAngular.Controllers
 						when 
 							A.DocTotal
 							=
-							isnull((SELECT SUM(Z1.CheckSum) FROM ODPS Z INNER JOIN OCHH Z1 ON Z.DeposId = Z1.DpstAbs INNER JOIN ORCT Z2 ON Z1.RcptNum = Z2.DocNum INNER JOIN RCT2 Z3 ON Z2.DocNum = Z3.DocNum
-							WHERE Z3.DocEntry = A.DocEntry AND z3.InvType = 13 and Z2.CANCELED = 'N'),0)
-                            and
                             isnull((SELECT SUM(T1.SumApplied) FROM RCT2 T1 INNER JOIN ORCT T0 ON T1.DocNum = T0.DocNum WHERE T1.DocEntry = A.DocEntry and T1.InvType = 13 and T0.Canceled = 'N'),0)
-                            =
-                            isnull((SELECT SUM(Z1.CheckSum) FROM ODPS Z INNER JOIN OCHH Z1 ON Z.DeposId = Z1.DpstAbs INNER JOIN ORCT Z2 ON Z1.RcptNum = Z2.DocNum INNER JOIN RCT2 Z3 ON Z2.DocNum = Z3.DocNum
-							WHERE Z3.DocEntry = A.DocEntry AND z3.InvType = 13 and Z2.CANCELED = 'N'),0)
-                            and
-                            A.DocTotal <> 0
 						then 'Fully Paid'
 						when
-							isnull((SELECT SUM(Z1.CheckSum) FROM ODPS Z INNER JOIN OCHH Z1 ON Z.DeposId = Z1.DpstAbs INNER JOIN ORCT Z2 ON Z1.RcptNum = Z2.DocNum INNER JOIN RCT2 Z3 ON Z2.DocNum = Z3.DocNum
-							WHERE Z3.DocEntry = A.DocEntry AND z3.InvType = 13 and Z2.CANCELED = 'N'),0)
-							>
 							isnull((SELECT SUM(T1.SumApplied) FROM RCT2 T1 INNER JOIN ORCT T0 ON T1.DocNum = T0.DocNum WHERE T1.DocEntry = A.DocEntry and T1.InvType = 13 and T0.Canceled = 'N'),0)
-							or
-							isnull((SELECT SUM(Z1.CheckSum) FROM ODPS Z INNER JOIN OCHH Z1 ON Z.DeposId = Z1.DpstAbs INNER JOIN ORCT Z2 ON Z1.RcptNum = Z2.DocNum INNER JOIN RCT2 Z3 ON Z2.DocNum = Z3.DocNum
-							WHERE Z3.DocEntry = A.DocEntry AND z3.InvType = 13 and Z2.CANCELED = 'N'),0)
 							>
 							A.DocTotal
 						then 'Over'
 						when
 							isnull((SELECT SUM(T1.SumApplied) FROM RCT2 T1 INNER JOIN ORCT T0 ON T1.DocNum = T0.DocNum WHERE T1.DocEntry = A.DocEntry and T1.InvType = 13 and T0.Canceled = 'N'),0)
+							<
+							A.DocTotal
+							and
+							isnull((SELECT SUM(T1.SumApplied) FROM RCT2 T1 INNER JOIN ORCT T0 ON T1.DocNum = T0.DocNum WHERE T1.DocEntry = A.DocEntry and T1.InvType = 13 and T0.Canceled = 'N'),0)
 							<>
-							isnull((SELECT SUM(Z1.CheckSum) FROM ODPS Z INNER JOIN OCHH Z1 ON Z.DeposId = Z1.DpstAbs INNER JOIN ORCT Z2 ON Z1.RcptNum = Z2.DocNum INNER JOIN RCT2 Z3 ON Z2.DocNum = Z3.DocNum
-							WHERE Z3.DocEntry = A.DocEntry AND z3.InvType = 13 and Z2.CANCELED = 'N'),0)
+							0
 						then 'Short'
 						when
-							isnull((SELECT SUM(Z1.CheckSum) FROM ODPS Z INNER JOIN OCHH Z1 ON Z.DeposId = Z1.DpstAbs INNER JOIN ORCT Z2 ON Z1.RcptNum = Z2.DocNum INNER JOIN RCT2 Z3 ON Z2.DocNum = Z3.DocNum
-							WHERE Z3.DocEntry = A.DocEntry AND z3.InvType = 13 and Z2.CANCELED = 'N'),0)
-							=
-							0
-							or
 							isnull((SELECT SUM(T1.SumApplied) FROM RCT2 T1 INNER JOIN ORCT T0 ON T1.DocNum = T0.DocNum WHERE T1.DocEntry = A.DocEntry and T1.InvType = 13 and T0.Canceled = 'N'),0)
 							=
 							0
 						then 'Unpaid'
-					end as 'Status',
+					end as 'ARIPStatus',
+                    case
+						when
+							isnull((SELECT SUM(T0.CheckSum) FROM RCT2 T1 INNER JOIN ORCT T0 ON T1.DocNum = T0.DocEntry WHERE T1.DocEntry = A.DocEntry and T1.InvType = 13 and T0.Canceled = 'N'),0)
+							=
+							isnull((SELECT SUM(Z1.CheckSum) FROM ODPS Z INNER JOIN OCHH Z1 ON Z.DeposId = Z1.DpstAbs INNER JOIN ORCT Z2 ON Z1.RcptNum = Z2.DocEntry INNER JOIN RCT2 Z3 ON Z2.DocEntry = Z3.DocNum
+							WHERE Z3.DocEntry = A.DocEntry AND z3.InvType = 13 and Z2.CANCELED = 'N'),0)
+							and
+							isnull((SELECT SUM(T0.CheckSum) FROM RCT2 T1 INNER JOIN ORCT T0 ON T1.DocNum = T0.DocEntry WHERE T1.DocEntry = A.DocEntry and T1.InvType = 13 and T0.Canceled = 'N'),0)
+							<>
+							0
+							or
+							isnull((SELECT SUM(Z1.CheckSum) FROM ODPS Z INNER JOIN OCHH Z1 ON Z.DeposId = Z1.DpstAbs INNER JOIN ORCT Z2 ON Z1.RcptNum = Z2.DocEntry INNER JOIN RCT2 Z3 ON Z2.DocEntry = Z3.DocNum
+							WHERE Z3.DocEntry = A.DocEntry AND z3.InvType = 13 and Z2.CANCELED = 'N'),0)
+							<>
+							0
+						then 'Full Deposit'
+						when
+							isnull((SELECT SUM(Z1.CheckSum) FROM ODPS Z INNER JOIN OCHH Z1 ON Z.DeposId = Z1.DpstAbs INNER JOIN ORCT Z2 ON Z1.RcptNum = Z2.DocEntry INNER JOIN RCT2 Z3 ON Z2.DocEntry = Z3.DocNum
+							WHERE Z3.DocEntry = A.DocEntry AND z3.InvType = 13 and Z2.CANCELED = 'N'),0)
+							>
+							isnull((SELECT SUM(T0.CheckSum) FROM RCT2 T1 INNER JOIN ORCT T0 ON T1.DocNum = T0.DocEntry WHERE T1.DocEntry = A.DocEntry and T1.InvType = 13 and T0.Canceled = 'N'),0)
+						then
+							'Over'
+						when
+							isnull((SELECT SUM(Z1.CheckSum) FROM ODPS Z INNER JOIN OCHH Z1 ON Z.DeposId = Z1.DpstAbs INNER JOIN ORCT Z2 ON Z1.RcptNum = Z2.DocEntry INNER JOIN RCT2 Z3 ON Z2.DocEntry = Z3.DocNum
+							WHERE Z3.DocEntry = A.DocEntry AND z3.InvType = 13 and Z2.CANCELED = 'N'),0)
+							<
+							isnull((SELECT SUM(T0.CheckSum) FROM RCT2 T1 INNER JOIN ORCT T0 ON T1.DocNum = T0.DocEntry WHERE T1.DocEntry = A.DocEntry and T1.InvType = 13 and T0.Canceled = 'N'),0)
+						then
+							'Short'
+						when
+							isnull((SELECT SUM(Z1.CheckSum) FROM ODPS Z INNER JOIN OCHH Z1 ON Z.DeposId = Z1.DpstAbs INNER JOIN ORCT Z2 ON Z1.RcptNum = Z2.DocEntry INNER JOIN RCT2 Z3 ON Z2.DocEntry = Z3.DocNum
+							WHERE Z3.DocEntry = A.DocEntry AND z3.InvType = 13 and Z2.CANCELED = 'N'),0)
+							=
+							0
+						then
+							'Undeposited'
+					end 'CSDepStatus',
                     A.DocTotal,
                     A.PaidSum,
-                    isnull((SELECT SUM(T1.SumApplied) FROM RCT2 T1 INNER JOIN ORCT T0 ON T1.DocNum = T0.DocNum WHERE T1.DocEntry = A.DocEntry and T1.InvType = 13 and T0.Canceled = 'N'),0) 'TotalPayment',
-                    isnull((SELECT SUM(Z1.CheckSum) FROM ODPS Z INNER JOIN OCHH Z1 ON Z.DeposId = Z1.DpstAbs INNER JOIN ORCT Z2 ON Z1.RcptNum = Z2.DocNum INNER JOIN RCT2 Z3 ON Z2.DocNum = Z3.DocNum
+                    isnull((SELECT SUM(T1.SumApplied) FROM RCT2 T1 INNER JOIN ORCT T0 ON T1.DocNum = T0.DocEntry WHERE T1.DocEntry = A.DocEntry and T1.InvType = 13 and T0.Canceled = 'N'),0) 'TotalPayment',
+                    isnull((SELECT SUM(T0.CheckSum) FROM RCT2 T1 INNER JOIN ORCT T0 ON T1.DocNum = T0.DocEntry WHERE T1.DocEntry = A.DocEntry and T1.InvType = 13 and T0.Canceled = 'N'),0) 'CheckSum',
+                    isnull((SELECT SUM(Z1.CheckSum) FROM ODPS Z INNER JOIN OCHH Z1 ON Z.DeposId = Z1.DpstAbs INNER JOIN ORCT Z2 ON Z1.RcptNum = Z2.DocEntry INNER JOIN RCT2 Z3 ON Z2.DocEntry = Z3.DocNum
 							WHERE Z3.DocEntry = A.DocEntry AND z3.InvType = 13 and Z2.CANCELED = 'N'),0) 'TotalDeposit',
                     A.DocEntry,
                     A.U_Remarks 'Remarks',
-                    C.GroupName
+                    C.GroupName,
+                    (select count(z.ARNo) from [PRODMONIT].[dbo].[ARMREMARKS] z where z.ARNo = A.DocNum) 'RemarksCount'
                 from
                     OINV A
                     left join [@BOCODE] D on A.U_BranchCode = D.Code
@@ -101,13 +127,14 @@ namespace AspNetAngular.Controllers
                 where
                     A.CANCELED = 'N'
                     and D.Name = {0}
+                    and A.U_SQPicked = 'No'
                 order by
                     A.DocDate";
             var queryResult = await _context.ARIPMonitoring.FromSql(rawQuery, branch).ToListAsync();
             return queryResult;
         }
 
-        [HttpGet("getARIPDetails")]
+        [HttpGet("getARDetails")]
         public async Task<ActionResult<IEnumerable<ARIPDetails>>> getARIPDetails(int docNum)
         {
             var rawQuery = @"
@@ -175,7 +202,7 @@ namespace AspNetAngular.Controllers
                     A.DocTotal,
                     A.PaidSum,
                     isnull((SELECT SUM(T1.SumApplied) FROM RCT2 T1 INNER JOIN ORCT T0 ON T1.DocNum = T0.DocNum WHERE T1.DocEntry = A.DocEntry and T1.InvType = 13 and T0.Canceled = 'N'),0) 'TotalPayment',
-					isnull((SELECT SUM(Z1.CheckSum) FROM ODPS Z INNER JOIN OCHH Z1 ON Z.DeposId = Z1.DpstAbs INNER JOIN ORCT Z2 ON Z1.RcptNum = Z2.DocNum INNER JOIN RCT2 Z3 ON Z2.DocNum = Z3.DocNum
+					isnull((SELECT SUM(Z1.CheckSum) FROM ODPS Z INNER JOIN OCHH Z1 ON Z.DeposId = Z1.DpstAbs INNER JOIN ORCT Z2 ON Z1.RcptNum = Z2.DocEntry INNER JOIN RCT2 Z3 ON Z2.DocEntry = Z3.DocNum
 							WHERE Z3.DocEntry = A.DocEntry AND z3.InvType = 13 and Z2.CANCELED = 'N'),0) 'TotalDeposit'
                 from
                     OINV A
@@ -186,6 +213,24 @@ namespace AspNetAngular.Controllers
                 where
                     A.DocEntry = {0}";
             var queryResult = await _context.ARIPDepDifference.FromSql(rawQuery, docEntry).ToListAsync();
+            return queryResult;
+        }
+
+        [HttpGet("getCSDepDifference")]
+        public async Task<ActionResult<IEnumerable<CSDepDifference>>> getCSDepDifference(int docNum)
+        {
+            var rawQuery = @"
+                select
+                    A.CheckSum,
+					isnull((SELECT SUM(Z1.CheckSum) FROM ODPS Z INNER JOIN OCHH Z1 ON Z.DeposId = Z1.DpstAbs WHERE Z1.RcptNum = A.DocEntry),0) 'TotalDeposit'
+                from
+                    ORCT A
+					inner join RCT2 B on A.DocEntry = B.DocNum
+                where
+                    A.DocNum = {0}
+					and A.CANCELED = 'N'
+					and B.InvType = 13";
+            var queryResult = await _context.CSDepDifference.FromSql(rawQuery, docNum).ToListAsync();
             return queryResult;
         }
 
@@ -219,6 +264,35 @@ namespace AspNetAngular.Controllers
         {
             var remarks = await _authDbContext.ARMRemarks.Where(ar => ar.ARNo == arNo).ToListAsync();
             return remarks;
+        }
+
+        [HttpPut("updateAR")]
+        public async Task<ActionResult<ResultReponser>> pickedAR(int[] arNo)
+        {
+            var updateQuery = @"update a set a.U_SQPicked = 'Yes' from OINV a where a.DocNum = {0}";
+            int updateCount = 0;
+            foreach(int docNum in arNo)
+            {
+                updateCount += await _context.Database.ExecuteSqlCommandAsync(updateQuery, docNum);
+            }
+            if (updateCount == arNo.Length)
+            {
+                return new ResultReponser
+                {
+                    Result = "Success",
+                    Message = "All documents were updated",
+                    ResponseData = ""
+                };
+            }
+            else
+            {
+                return new ResultReponser
+                {
+                    Result = "Success",
+                    Message = "Not all documents were updated",
+                    ResponseData = ""
+                };
+            }
         }
     }
 }

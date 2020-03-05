@@ -41,7 +41,7 @@ export const navItems: NavData[] = [
   // },
   {
     title: true,
-    name: 'Main'
+    name: 'Monitoring'
   },
   {
     name: 'Prod. Monitoring',
@@ -62,5 +62,10 @@ export const navItems: NavData[] = [
     name: 'Account',
     url: '/account',
     icon: 'fa fa-check-square-o'
+  },
+  {
+    name: 'Test',
+    url: '/production-order',
+    icon: 'fa fa-copy'
   }
 ];

@@ -92,12 +92,15 @@ export class AccountsComponent implements OnInit {
       { label: 'Production Monitoring', column: 'PM', checked: false },
       { label: 'PM Remarks', column: 'PMRemarks', checked: false },
       { label: 'Remove From List', column: 'PMPick', checked: false },
+      { label: 'Generate', column: 'PMGenerate', checked: false },
       { label: 'ITR / IT Monitoring', column: 'ITRM', checked: false },
       { label: 'ITRM Remarks', column: 'ITRMRemarks', checked: false },
       { label: 'Remove From List', column: 'ITRMPick', checked: false },
-      { label: 'AR / IP Monitoring', column: 'ARM', checked: false},
-      { label: 'AR Remarks', column: 'ARMRemarks', checked: false},
-      { label: 'Remove From List', column: 'ARMPick', checked: false}
+      { label: 'Generate', column: 'ITRMGenerate', checked: false },
+      { label: 'AR / IP Monitoring', column: 'ARM', checked: false },
+      { label: 'AR Remarks', column: 'ARMRemarks', checked: false },
+      { label: 'Remove From List', column: 'ARMPick', checked: false },
+      { label: 'Generate', column: 'ARMGenerate', checked: false }
     ];
   }
 
@@ -148,22 +151,19 @@ export class AccountsComponent implements OnInit {
           });
           const feature = response.responseData.features;
           this.accountFeatures = [
-            { label: 'SQ', column: 'SQ', checked: feature.sq },
-            { label: 'Generate CEF', column: 'SQGenerateCEF', checked: feature.sqGenerateCEF },
-            { label: 'Show GL / UC / PDC', column: 'SQShowGLUCPDC', checked: feature.sqShowGLUCPDC },
-            { label: 'Approve / Disapprove', column: 'SQApprove', checked: feature.sqApprove },
-            { label: 'Remove From List', column: 'SQRemoveFromList', checked: feature.sqRemoveFromList },
-            { label: 'Generate Report', column: 'SQGenerateReport', checked: feature.sqGenerateReport },
-            { label: 'SO Monitoring', column: 'SOM', checked: feature.som },
-            { label: 'Remove From List', column: 'SOMRemoveFromList', checked: feature.somRemoveFromList },
-            { label: 'Generate Report', column: 'SOMGenerateReport', checked: feature.somGenerateReport },
-            { label: 'SOA Monitoring', column: 'SOA', checked: feature.soa },
-            { label: 'Remove From List', column: 'SOARemoveFromList', checked: feature.soaRemoveFromList },
-            { label: 'Generate Report', column: 'SOAGenerateReport', checked: feature.soaGenerateReport },
-            { label: 'Order Frequency', column: 'ORF', checked: feature.orf },
-            { label: 'Log', column: 'ORFLog', checked: feature.orfLog },
-            { label: 'Generate Report', column: 'ORFGenerateReport', checked: feature.orfGenerateReport },
-            { label: 'Dashboard', column: 'Dashboard', checked: feature.dashboard }
+            { label: 'Production Monitoring', column: 'PM', checked: feature.pm },
+            { label: 'PM Remarks', column: 'PMRemarks', checked: feature.pmRemarks },
+            { label: 'Remove From List', column: 'PMPick', checked: feature.pmPick },
+            { label: 'Generate', column: 'PMGenerate', checked: feature.pmGenerate },
+            { label: 'ITR / IT Monitoring', column: 'ITRM', checked: feature.itrm },
+            { label: 'ITRM Remarks', column: 'ITRMRemarks', checked: feature.itrRemarks },
+            { label: 'Remove From List', column: 'ITRMPick', checked: feature.itrmPick },
+            { label: 'Generate', column: 'ITRMGenerate', checked: feature.itrmGenerate },
+            { label: 'AR / IP Monitoring', column: 'ARM', checked: feature.arm },
+            { label: 'AR Remarks', column: 'ARMRemarks', checked: feature.armRemarks },
+            { label: 'Remove From List', column: 'ARMPick', checked: feature.armPick },
+            { label: 'Generate', column: 'ARMGenerate', checked: feature.armGenerate },
+            // { label: 'Dashboard', column: 'Dashboard', checked: feature.dashboard }
           ];
           Swal.close();
         },
@@ -199,73 +199,69 @@ export class AccountsComponent implements OnInit {
   onSubmit() {
     if (this.modalHeader == 'Account Info') {
       this.updateAccount(this.user_id);
+      console.log('account info');
     } else {
       this.register();
+      console.log('register');
     }
   }
 
   register() {
-    // if (this.formreg.controls.password.value == this.formreg.controls.confirmpassword.value) {
-    //   this.alertPasswordNotMatch = false;
-    //   this.showLoadingFetchData();
-    //   const registration = new RegistrationViewModel();
-    //   registration.userName = this.formreg.controls.email.value;
-    //   registration.lastName = this.formreg.controls.lastName.value;
-    //   registration.firstName = this.formreg.controls.firstName.value;
-    //   registration.middleName = this.formreg.controls.middleName.value;
+    if (this.formreg.controls.password.value == this.formreg.controls.confirmpassword.value) {
+      this.alertPasswordNotMatch = false;
+      this.showLoadingFetchData();
+      const registration = new RegistrationViewModel();
+      registration.userName = this.formreg.controls.email.value;
+      registration.lastName = this.formreg.controls.lastName.value;
+      registration.firstName = this.formreg.controls.firstName.value;
+      registration.middleName = this.formreg.controls.middleName.value;
 
-    //   // Account Features
-    //   registration.sq = this.accountFeatures.find(i => i.column == 'SQ').checked;
-    //   registration.sqGenerateCEF = this.accountFeatures.find(i => i.column == 'SQGenerateCEF').checked;
-    //   registration.sqShowGLUCPDC = this.accountFeatures.find(i => i.column == 'SQShowGLUCPDC').checked;
-    //   registration.sqApprove = this.accountFeatures.find(i => i.column == 'SQApprove').checked;
-    //   registration.sqRemoveFromList = this.accountFeatures.find(i => i.column == 'SQRemoveFromList').checked;
-    //   registration.sqGenerateReport = this.accountFeatures.find(i => i.column == 'SQGenerateReport').checked;
-    //   registration.som = this.accountFeatures.find(i => i.column == 'SOM').checked;
-    //   registration.somRemoveFromList = this.accountFeatures.find(i => i.column == 'SOMRemoveFromList').checked;
-    //   registration.somGenerateReport = this.accountFeatures.find(i => i.column == 'SOMGenerateReport').checked;
-    //   registration.soa = this.accountFeatures.find(i => i.column == 'SOA').checked;
-    //   registration.soaRemoveFromList = this.accountFeatures.find(i => i.column == 'SOARemoveFromList').checked;
-    //   registration.soaGenerateReport = this.accountFeatures.find(i => i.column == 'SOAGenerateReport').checked;
-    //   registration.orf = this.accountFeatures.find(i => i.column == 'ORF').checked;
-    //   registration.orfLog = this.accountFeatures.find(i => i.column == 'ORFLog').checked;
-    //   registration.orfGenerateReport = this.accountFeatures.find(i => i.column == 'ORFGenerateReport').checked;
-    //   registration.dashboard = this.accountFeatures.find(i => i.column == 'Dashboard').checked;
+      // Account Features
+      registration.pm = this.accountFeatures.find(i => i.column == 'PM').checked;
+      registration.pmRemarks = this.accountFeatures.find(i => i.column == 'PMRemarks').checked;
+      registration.pmPick = this.accountFeatures.find(i => i.column == 'PMPick').checked;
+      registration.itrm = this.accountFeatures.find(i => i.column == 'ITRM').checked;
+      registration.itrmRemarks = this.accountFeatures.find(i => i.column == 'ITRMRemarks').checked;
+      registration.itrmPick = this.accountFeatures.find(i => i.column == 'ITRMPick').checked;
+      registration.arm = this.accountFeatures.find(i => i.column == 'ARM').checked;
+      registration.armRemarks = this.accountFeatures.find(i => i.column == 'ARMRemarks').checked;
+      registration.armPick = this.accountFeatures.find(i => i.column == 'ARMPick').checked;
+      // registration.dashboard = this.accountFeatures.find(i => i.column == 'Dashboard').checked;
 
-    //   registration.password = this.formreg.controls.password.value;
-    //   registration.location = this.selectedSeries;
-    //   registration.role = this.formreg.controls.userType.value;
-    //   this.apiService.register(registration)
-    //     .subscribe(
-    //       response => {
-    //         if (response.result == 'success') {
-    //           Swal.close();
-    //           Swal(
-    //             '',
-    //             'Account Added Successfully!',
-    //             'success'
-    //           );
-    //           this.getAllUsers();
-    //           this.closeModal();
-    //           this.formreg.reset();
-    //           this.selectedSeries = new Array();
-    //         } else {
-    //           Swal.close();
-    //           Swal(
-    //             '',
-    //             'Email Address is already exists!',
-    //             'error'
-    //           );
-    //         }
-    //       },
-    //       errorr => {
-    //         Swal.close();
-    //         console.log('HTTP error', errorr);
-    //       }
-    //     );
-    // } else {
-    //   this.alertPasswordNotMatch = true;
-    // }
+      registration.password = this.formreg.controls.password.value;
+      registration.location = this.selectedSeries;
+      registration.role = this.formreg.controls.userType.value;
+      this.apiService.register(registration)
+        .subscribe(
+          response => {
+            if (response.result == 'success') {
+              Swal.close();
+              Swal.fire(
+                '',
+                'Account Added Successfully!',
+                'success'
+              );
+              this.getAllUsers();
+              this.closeModal();
+              this.formreg.reset();
+              this.selectedSeries = new Array();
+            } else {
+              Swal.close();
+              Swal.fire(
+                '',
+                'Email Address is already exists!',
+                'error'
+              );
+            }
+          },
+          errorr => {
+            Swal.close();
+            console.log('HTTP error', errorr);
+          }
+        );
+    } else {
+      this.alertPasswordNotMatch = true;
+    }
   }
 
   checkSeries(e: any) {
@@ -301,109 +297,106 @@ export class AccountsComponent implements OnInit {
   }
 
   deleteAccount(identity: string) {
-    // Swal.fire({
-    //   title: 'Are you sure?',
-    //   text: "You won't be able to revert this!",
-    //   type: 'warning',
-    //   showCancelButton: true,
-    //   confirmButtonColor: '#3085d6',
-    //   cancelButtonColor: '#d33',
-    //   confirmButtonText: 'Yes, delete it!'
-    // }).then((result) => {
-    //   if (result.value) {
-    //     this.apiService.deleteAccount(identity)
-    //       .subscribe(
-    //         response => {
-    //           if (response.result == 'success') {
-    //             this.getAllUsers();
-    //             Swal.fire(
-    //               'Success!',
-    //               'Updated!',
-    //               'success'
-    //             );
-    //           } else {
-    //             Swal.fire({
-    //               type: 'error',
-    //               title: 'Oops...',
-    //               text: 'Something went wrong!',
-    //               footer: ''
-    //             });
-    //           }
-    //         }
-    //       );
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      type: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+      if (result.value) {
+        this.apiService.delete(identity)
+          .subscribe(
+            response => {
+              if (response.result == 'Success') {
+                this.getAllUsers();
+                Swal.fire(
+                  'Success!',
+                  'Updated!',
+                  'success'
+                );
+              } else {
+                Swal.fire({
+                  type: 'error',
+                  title: 'Oops...',
+                  text: 'Something went wrong!',
+                  footer: ''
+                });
+              }
+            }
+          );
 
-    //   }
-    // });
+      }
+    });
   }
 
   updateAccount(user_id: string) {
-    // Swal.fire({
-    //   title: 'Are you sure?',
-    //   text: "You want to update this account",
-    //   type: 'warning',
-    //   showCancelButton: true,
-    //   confirmButtonColor: '#3085d6',
-    //   cancelButtonColor: '#d33',
-    //   confirmButtonText: 'Yes!'
-    // }).then((result) => {
-    //   if (result.value) {
-    //     this.showLoadingFetchData();
-    //     const accountViewModel = new AccountViewModel();
-    //     let locationDelete = [];
-    //     let locationAdd = [];
-    //     this.accountSeries.forEach(o => {
-    //       if (o.checked == true) {
-    //         locationAdd.push(o.value);
-    //       } else {
-    //         locationDelete.push(o.value);
-    //       }
-    //     });
-    //     accountViewModel.lastName = this.formreg.controls.lastName.value;
-    //     accountViewModel.firstName = this.formreg.controls.firstName.value;
-    //     accountViewModel.middleName = this.formreg.controls.middleName.value;
-    //     // Account Features
-    //     accountViewModel.sq = this.accountFeatures.find(i => i.column == 'SQ').checked;
-    //     accountViewModel.sqGenerateCEF = this.accountFeatures.find(i => i.column == 'SQGenerateCEF').checked;
-    //     accountViewModel.sqShowGLUCPDC = this.accountFeatures.find(i => i.column == 'SQShowGLUCPDC').checked;
-    //     accountViewModel.sqApprove = this.accountFeatures.find(i => i.column == 'SQApprove').checked;
-    //     accountViewModel.sqRemoveFromList = this.accountFeatures.find(i => i.column == 'SQRemoveFromList').checked;
-    //     accountViewModel.sqGenerateReport = this.accountFeatures.find(i => i.column == 'SQGenerateReport').checked;
-    //     accountViewModel.som = this.accountFeatures.find(i => i.column == 'SOM').checked;
-    //     accountViewModel.somRemoveFromList = this.accountFeatures.find(i => i.column == 'SOMRemoveFromList').checked;
-    //     accountViewModel.somGenerateReport = this.accountFeatures.find(i => i.column == 'SOMGenerateReport').checked;
-    //     accountViewModel.soa = this.accountFeatures.find(i => i.column == 'SOA').checked;
-    //     accountViewModel.soaRemoveFromList = this.accountFeatures.find(i => i.column == 'SOARemoveFromList').checked;
-    //     accountViewModel.soaGenerateReport = this.accountFeatures.find(i => i.column == 'SOAGenerateReport').checked;
-    //     accountViewModel.orf = this.accountFeatures.find(i => i.column == 'ORF').checked;
-    //     accountViewModel.orfLog = this.accountFeatures.find(i => i.column == 'ORFLog').checked;
-    //     accountViewModel.orfGenerateReport = this.accountFeatures.find(i => i.column == 'ORFGenerateReport').checked;
-    //     accountViewModel.dashboard = this.accountFeatures.find(i => i.column == 'Dashboard').checked;
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "You want to update this account",
+      type: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes!'
+    }).then((result) => {
+      if (result.value) {
+        this.showLoadingFetchData();
+        const accountViewModel = new AccountViewModel();
+        let locationDelete = [];
+        let locationAdd = [];
+        this.accountSeries.forEach(o => {
+          if (o.checked == true) {
+            locationAdd.push(o.value);
+          } else {
+            locationDelete.push(o.value);
+          }
+        });
+        accountViewModel.lastName = this.formreg.controls.lastName.value;
+        accountViewModel.firstName = this.formreg.controls.firstName.value;
+        accountViewModel.middleName = this.formreg.controls.middleName.value;
+        // Account Features
+        accountViewModel.pm = this.accountFeatures.find(i => i.column == 'PM').checked;
+        accountViewModel.pmRemarks = this.accountFeatures.find(i => i.column == 'PMRemarks').checked;
+        accountViewModel.pmPick = this.accountFeatures.find(i => i.column == 'PMPick').checked;
+        accountViewModel.pmGenerate = this.accountFeatures.find(i => i.column == 'PMGenerate').checked;
+        accountViewModel.itrm = this.accountFeatures.find(i => i.column == 'ITRM').checked;
+        accountViewModel.itrmRemarks = this.accountFeatures.find(i => i.column == 'ITRMRemarks').checked;
+        accountViewModel.itrmPick = this.accountFeatures.find(i => i.column == 'ITRMPick').checked;
+        accountViewModel.itrmGenerate = this.accountFeatures.find(i => i.column == 'ITRMGenerate').checked;
+        accountViewModel.arm = this.accountFeatures.find(i => i.column == 'ARM').checked;
+        accountViewModel.armRemarks = this.accountFeatures.find(i => i.column == 'ARMRemarks').checked;
+        accountViewModel.armPick = this.accountFeatures.find(i => i.column == 'ARMPick').checked;
+        accountViewModel.armGenerate = this.accountFeatures.find(i => i.column == 'ARMGenerate').checked;
+        // accountViewModel.dashboard = this.accountFeatures.find(i => i.column == 'Dashboard').checked;
 
-    //     accountViewModel.role = this.formreg.controls.userType.value;
-    //     accountViewModel.locationDelete = locationDelete;
-    //     accountViewModel.locationAdd = locationAdd;
-    //     this.apiService.putAccount(user_id, accountViewModel)
-    //       .subscribe(
-    //         response => {
-    //           if (response.result == 'update') {
-    //             Swal.close();
-    //             Swal.fire(
-    //               'Success!',
-    //               'Updated!',
-    //               'success'
-    //             );
-    //             this.getAllUsers();
-    //             this.closeModal();
-    //             this.formreg.reset();
-    //           }
-    //         },
-    //         errorr => {
-    //           Swal.close();
-    //           console.log('HTTP error', errorr);
-    //         }
-    //       );
-    //   }
-    // });
+        accountViewModel.role = this.formreg.controls.userType.value;
+        accountViewModel.locationDelete = locationDelete;
+        accountViewModel.locationAdd = locationAdd;
+        this.apiService.update(user_id, accountViewModel)
+          .subscribe(
+            response => {
+              if (response.result == 'Update') {
+                Swal.close();
+                Swal.fire(
+                  'Success!',
+                  'Updated!',
+                  'success'
+                );
+                this.getAllUsers();
+                this.closeModal();
+                this.formreg.reset();
+              }
+            },
+            errorr => {
+              Swal.close();
+              console.log('HTTP error', errorr);
+            }
+          );
+      }
+    });
   }
 
   resetPassword(userName: string) {

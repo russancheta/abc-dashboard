@@ -17,6 +17,9 @@ namespace AspNetAngular.ViewModel
         public bool ITRM { get; set; }
         public bool ITRMRemarks { get; set; }
         public bool ITRMPick { get; set; }
+        public bool ARM { get; set; }
+        public bool ARMRemarks { get; set; }
+        public bool ARMPick { get; set; }
         public string[] Location { get; set; }
         public string Role { get; set; }
     }

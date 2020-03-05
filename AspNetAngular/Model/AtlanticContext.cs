@@ -20,6 +20,7 @@ namespace AspNetAngular.Model
         public virtual DbQuery<IPDetails> IPDetails { get; set; }
         public virtual DbQuery<DepositDetails> DepositDetails { get; set; }
         public virtual DbQuery<ARIPDepDifference> ARIPDepDifference { get; set; }
+        public virtual DbQuery<CSDepDifference> CSDepDifference { get; set; }
         public virtual DbQuery<ProductionOrder> ProductionOrder { get; set; }
         public virtual DbQuery<ProdOrderDetails> ProdOrderDetails { get; set; }
         public virtual DbQuery<InvTransferDetails> InvTransferDetails { get; set; }

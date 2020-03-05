@@ -6,9 +6,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using AspNetAngular.Model;
 using System.Data.SqlClient;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AspNetAngular.Controllers
 {
+    [Authorize (Policy = "ApiUser")]
     [Route("api/controllers")]
     [ApiController]
 
@@ -56,7 +58,8 @@ namespace AspNetAngular.Controllers
                         then 'Unserved'
                     end 'Status',
                     a.U_Remarks 'DocRemarks',
-                    '' 'Group'
+                    '' 'Group',
+                    (select count(z.ITRNo) from [PRODMONIT].[dbo].[ITRMREMARKS] z where z.ITRNo = A.DocNum) 'RemarksCount'
                 from
 	                OWTQ A
 	                inner join WTQ1 B on A.DocEntry = B.DocEntry
@@ -110,7 +113,8 @@ namespace AspNetAngular.Controllers
 						then 'Intermediate'
 						when (select z.WhsName from OWHS z where z.WhsCode = A.Filler) like '%Packaging & Other Materials%'
 						then 'Packaging & Other Materials'
-					end 'Group'
+					end 'Group',
+                    (select count(z.ITRNo) from [PRODMONIT].[dbo].[ITRMREMARKS] z where z.ITRNo = A.DocNum) 'RemarksCount'
                 from
 	                OWTQ A
 	                inner join WTQ1 B on A.DocEntry = B.DocEntry
@@ -226,7 +230,8 @@ namespace AspNetAngular.Controllers
                     b.ItemCode,
                     b.Dscription,
                     isnull(b.Quantity,0) 'ITRQuantity',
-                    sum(isnull(c.Quantity,0)) 'ITQuantity'
+                    sum(isnull(c.Quantity,0)) 'ITQuantity',
+                    isnull(isnull(sum(isnull(c.Quantity,0)),0) - isnull(b.Quantity,0),0) 'Variance'
                 from
                     OWTQ a
                     inner join WTQ1 b on a.DocEntry = b.DocEntry
@@ -278,7 +283,7 @@ namespace AspNetAngular.Controllers
         [HttpPut("updateITR")]
         public async Task<ActionResult<ResultReponser>> pickedITR(int[] itrNo)
         {
-            var updateQuery = @"update a set a.U_SQPicked = 'Y' from OWTQ a where a.DocNum = {0}";
+            var updateQuery = @"update a set a.U_SQPicked = 'Yes' from OWTQ a where a.DocNum = {0}";
             int updateCount = 0;
             foreach(int docNum in itrNo)
             {

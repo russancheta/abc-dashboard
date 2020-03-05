@@ -118,12 +118,12 @@
                     <div class="card" style="height:535px;">
                         <div class="card-header">
                             List of Location
-                            <!-- <div class="form-check">
+                            <div class="form-check">
                                 <input class="form-check-input" type="checkbox" (change)="checkAll($event.target)">
                                 <label class="form-check-label">
                                   {{ checkLabel }}
                                 </label>
-                              </div> -->
+                            </div>
                         </div>
                         <ul class="list-group list-group-flush">
                             <li *ngFor="let o of accountSeries" class="list-group-item">
@@ -150,6 +150,9 @@
                                     <hr class="my-3">
                                 </ng-template>
                                 <ng-template [ngIf]="o.column == 'ITRM'">
+                                    <hr class="my-3">
+                                </ng-template>
+                                <ng-template [ngIf]="o.column == 'ARM'">
                                     <hr class="my-3">
                                 </ng-template>
                                 <div class="form-check">

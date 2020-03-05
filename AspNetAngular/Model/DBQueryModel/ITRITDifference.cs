@@ -8,5 +8,6 @@ namespace AspNetAngular.Model
         public string Dscription { get; set; }
         public decimal ITRQuantity { get; set; }
         public decimal ITQuantity { get; set; }
+        public decimal Variance { get; set; }
     }
 }

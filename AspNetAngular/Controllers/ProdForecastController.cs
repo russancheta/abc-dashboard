@@ -6,9 +6,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using AspNetAngular.Model;
 using System.Data.SqlClient;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AspNetAngular.Controllers
 {
+    [Authorize (Policy = "ApiUser")]
     [Route("api/controllers")]
     [ApiController]
 
@@ -51,7 +53,8 @@ namespace AspNetAngular.Controllers
 						then 'Unserved'
 					end 'Status',
                     A.U_Remarks 'DocRemarks',
-                    A.DocEntry
+                    A.DocEntry,
+                    (select count(z.SQNo) from [PRODMONIT].[dbo].[PMREMARKS] z where z.SQNo = A.DocNum) 'RemarksCount'
                 from
                     OQUT A
 					inner join QUT1 B on A.DocEntry = B.DocEntry
@@ -124,7 +127,8 @@ namespace AspNetAngular.Controllers
 					T1.ItemCode,
                     T1.Dscription,
 					isnull(T1.Quantity,0) 'SQQuantity',
-					isnull(T2.Quantity,0) 'GRQuantity'
+					isnull(T2.Quantity,0) 'GRQuantity',
+                    isnull(isnull(T2.Quantity,0) - isnull(T1.Quantity,0),0) 'Variance'
                 FROM 
                     OQUT T0
 					inner join QUT1 T1 ON T0.DocEntry = T1.DocEntry
@@ -215,7 +219,7 @@ namespace AspNetAngular.Controllers
         [HttpPut("updateSQ")]
         public async Task<ActionResult<ResultReponser>> pickedSQ(int[] sqNo)
         {
-            var updateQuery = @"update a set a.U_SQPicked = 'Y' from OQUT a where a.DocNum = {0}";
+            var updateQuery = @"update a set a.U_SQPicked = 'Yes' from OQUT a where a.DocNum = {0}";
             int updateCount = 0;
             foreach (int docNum in sqNo)
             {

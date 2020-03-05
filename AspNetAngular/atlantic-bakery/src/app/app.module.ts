@@ -8,6 +8,9 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { PERFECT_SCROLLBAR_CONFIG } from 'ngx-perfect-scrollbar';
 import { PerfectScrollbarConfigInterface } from 'ngx-perfect-scrollbar';
+import { JwtInterceptor } from '../app/_helpers/jwt.interceptor';
+import { ErrorInterceptor } from '../app/_helpers/error.interceptor';
+import { ChangePasswordComponent } from './views/changepassword/changepassword.component';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ModalModule } from 'ngx-bootstrap/modal';
@@ -100,10 +103,14 @@ import { ArIpComponent } from './views/ar-ip/ar-ip.component';
     GoodsReceiptComponent,
     JoborderMonitoringComponent,
     AccountsComponent,
-    ArIpComponent
+    ArIpComponent,
+    ChangePasswordComponent
   ],
   providers: [Service,
     HttpClientModule,
+    // WebApiEndpointConfigService,
+    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
     {
       provide: API_BASE_URL, useFactory: () => {
         return environment.API_BASE_URL;

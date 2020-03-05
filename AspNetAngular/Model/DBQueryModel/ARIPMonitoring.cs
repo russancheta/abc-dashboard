@@ -10,13 +10,16 @@ namespace AspNetAngular.Model
         public string CardName { get; set; }
         public string IPNo { get; set; }
         public string DepositNo { get; set; }
-        public string Status { get; set; }
+        public string ARIPStatus { get; set; }
+        public string CSDepStatus { get; set; }
         public decimal DocTotal { get; set; }
         public decimal PaidSum { get; set; }
         public decimal TotalPayment { get; set; }
+        public decimal CheckSum { get; set; }
         public decimal TotalDeposit { get; set; }
         public int DocEntry { get; set; }
         public string Remarks { get; set; }
         public string Groupname { get; set; }
+        public int RemarksCount { get; set; }
     }
 }

@@ -5,9 +5,11 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using AspNetAngular.Model;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AspNetAngular.Controllers
 {
+    [Authorize (Policy = "ApiUser")]
     [Route("api/controllers")]
     [ApiController]
     public class BranchList : ControllerBase

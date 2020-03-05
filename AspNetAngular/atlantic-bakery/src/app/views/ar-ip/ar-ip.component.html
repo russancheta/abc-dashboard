@@ -32,6 +32,14 @@
                 </select>
             </div>
         </div>
+        <div class="col-md-2">
+
+        </div>
+        <div class="col-md-2">
+            <ng-template [ngIf]="authService.getCurrentUser().user.armGenerate == true">
+                <button type="button" class="btn btn-primary" (click)="openReportModal(reportModal)">View Report</button>
+            </ng-template>
+        </div>
     </div>
     <ngb-tabset>
         <ngb-tab>
@@ -41,7 +49,7 @@
                 <div class="table-responsive">
                     <div class="d-flex flex-row-reverse" *ngIf="selectedAR.length > 0">
                         <p>Selected: <strong> {{ selectedAR.length }} - </strong> <button type="button"
-                            class="btn btn-primary btn-sm">Close</button>
+                            class="btn btn-primary btn-sm" (click)="closeAR(selectedAR)">Close</button>
                         </p>
                     </div>
                     <table class="table table-hover table-sm">
@@ -53,15 +61,18 @@
                                 <th>Days Due</th>
                                 <th>IP No.</th>
                                 <th>Dep. No.</th>
-                                <th>Status</th>
+                                <th>AR/IP Status</th>
+                                <th>CS/Dep. Status</th>
                                 <th class="text-center">Remarks</th>
-                                <th>Pick</th>
+                                <ng-template [ngIf]="authService.getCurrentUser().user.armPick == true">
+                                    <th>Pick</th>
+                                </ng-template>
                             </tr>
                         </thead>
                         <tbody>
                             <tr
                                 *ngFor="let i of returnAR | slice: (page-1) * pageSize : (page-1) * pageSize + pageSize">
-                                <td> {{ i.docDate | date: 'yyyy-MM-dd'}} </td>
+                                <td> {{ i.docDate | date: 'MM-dd-yyyy' }} </td>
                                 <td> <button type="button" class="btn btn-link btn-sm"
                                         (click)="arModalDetails(arModal, i.arNo)"> {{ i.arNo }} </button> </td>
                                 <td> {{ i.cardName }} </td>
@@ -91,18 +102,28 @@
                                     </ng-template>
                                 </td>
                                 <td>
-                                    <button type="button" class="btn btn-link btn-sm"
-                                        (click)="aripdepModalDetails(statusModal, i.docEntry)"> {{ i.status }} </button>
-                                </td>
-                                <td class="text-center">
-                                    <button type="button"><i class="fa fa-pencil-square-o fa-lg"></i></button>
+                                    <button type="button" class="btn btn-link btn-sm" (click)="aripModalDetails(statusModal, i.docEntry)"> 
+                                        {{ i.aripStatus }} 
+                                    </button>
                                 </td>
                                 <td>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox"
-                                            (change)="checkedAR(i.arNo)">
-                                    </div>
+                                    <button type="button" class="btn btn-link btn-sm text-success" (click)="csdepModalDetails(csdepModal, i.ipNo)">
+                                        {{ i.csDepStatus }}
+                                    </button>
                                 </td>
+                                <td class="text-center">
+                                    <button type="button" (click)="openModalListRemarks(remarksNotes, i.arNo)"
+                                    [ngClass]="i.remarksCount == 0 ? 'btn btn-link btn-sm text-danger' : 'btn btn-link btn-sm text-success'">
+                                        <i class="fa fa-pencil-square-o fa-lg"></i></button>
+                                </td>
+                                <ng-template [ngIf]="authService.getCurrentUser().user.armPick == true">
+                                    <td>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" (change)="checkedAR(i.arNo)" 
+                                            [disabled]="i.groupname == 'Customers' || i.groupname == 'Branch/Outlet' && i.remarksCount == 0">
+                                        </div>
+                                    </td>
+                                </ng-template>
                             </tr>
                         </tbody>
                     </table>
@@ -171,14 +192,14 @@
                         <tr>
                             <th>Cash Sum</th>
                             <th>Check Sum</th>
-                            <th>Transfer Amount</th>
+                            <th>Total</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr *ngFor="let i of ipDetails">
                             <td> {{ i.cashSum }} </td>
                             <td> {{ i.checkSum }} </td>
-                            <td> {{ i.trsfrSum }} </td>
+                            <td> {{ cashCheckTotal }} </td>
                         </tr>
                     </tbody>
                 </table>
@@ -207,7 +228,7 @@
                     </thead>
                     <tbody>
                         <tr *ngFor="let i of depositDetails">
-                            <td> {{ i.deposDate | date: 'yyyy-MM-dd' }} </td>
+                            <td> {{ i.deposDate | date: 'MM-dd-yyyy' }} </td>
                             <td> {{ i.banckAcct }} </td>
                             <td> {{ i.checkSum }} </td>
                         </tr>
@@ -217,9 +238,10 @@
         </div>
     </div>
 </ng-template>
+
 <ng-template #statusModal let-modal>
     <div class="modal-header">
-        <h4 class="modal-title" id="modal-basic-title">AR IP Deposit Difference</h4>
+        <h4 class="modal-title" id="modal-basic-title">AR IP Difference</h4>
         <button type="button" class="close" aria-label="close" (click)="closeModal()">
             <span aria-hidden="true">&times;</span>
         </button>
@@ -233,13 +255,41 @@
                         <tr>
                             <th>AR Total</th>
                             <th>IP Total</th>
-                            <th>Deposit Total</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr *ngFor="let i of difference">
                             <td> {{ i.docTotal }} </td>
                             <td> {{ i.totalPayment }} </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #csdepModal let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title" id="modal-basic-title">Check Sum Deposit Difference</h4>
+        <button type="button" class="close" aria-label="close" (click)="closeModal()">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <strong>Details</strong>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover-sm">
+                    <thead>
+                        <tr>
+                            <th>Check Total</th>
+                            <th>Deposit Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let i of csdepDifference">
+                            <td> {{ i.checkSum }} </td>
                             <td> {{ i.totalDeposit }} </td>
                         </tr>
                     </tbody>
@@ -262,7 +312,7 @@
             </div>
             <div class="d-flex flex-row-reverse">
                 <button type="submit" class="btn btn-primary" [disabled]="submitBtn">Save <i *ngIf="submitBtn"
-                    class="fa fa-spinner fa-spin"></i></button>
+                        class="fa fa-spinner fa-spin"></i></button>
             </div>
         </form>
     </div>
@@ -290,7 +340,7 @@
                         </thead>
                         <tbody>
                             <tr *ngFor="let o of remarks">
-                                <td>{{ o.logDate | date: 'yyyy-MM-dd' }}</td>
+                                <td>{{ o.logDate | date: 'MM-dd-yyyy' }}</td>
                                 <td>{{ o.remarks }}</td>
                             </tr>
                         </tbody>
@@ -298,6 +348,74 @@
                 </div>
             </div>
         </div>
+    </div>
+</ng-template>
+
+<ng-template #reportModal let-modal>
+    <div class="modal-body">
+        <button type="button" class="close" aria-label="Close" (click)="closeModal()">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        <label><strong>Report Filter</strong></label>
+        <form [formGroup]="formReport">
+            <div class="form-group">
+                <label>
+                    Type
+                </label>
+                <select class="form-control" (change)="onSelectReportType($event.target.value)">
+                    <option *ngFor="let o of reportTypeSelection" [value]="o.value">
+                        {{ o.label }}
+                    </option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Branch</label>
+                <select class="form-control" (change)="onChangeBranchReport($event.target.value)">
+                    <option [value]="'All'">All</option>
+                    <option *ngFor="let b of branchList">
+                        {{ b.name }}
+                    </option>
+                </select>
+            </div>
+            <ng-template [ngIf]="reportType == 'type2'">
+                <div class="form-group">
+                    <label>Status</label>
+                    <select class="form-control" [ngModel]="report2filterOptionSelected"
+                        [ngModelOptions]="{standalone: true}" (ngModelChange)="report2filterOptionSelected"
+                        (change)="onChangeReportFilterStatus($event.target.value)">
+                        <option *ngFor="let o of statusFilter" [value]="o.value"> {{ o.name }} </option>
+                    </select>
+                </div>
+            </ng-template>
+            <ng-template [ngIf]="reportType == 'type1'">
+                <div class="form-group">
+                    <label>From</label>
+                    <div class="input-group">
+                        <input class="form-control" placeholder="yyyy-mm-dd" ngbDatepicker #d1="ngbDatepicker"
+                            [maxDate]="dtp1MaxDate" formControlName="dtp1" (dateSelect)="onChangeDpt()">
+                        <span class="input-group-append">
+                            <button class="btn btn-secondary fa fa-calendar" (click)="d1.toggle()"
+                                type="button"></button>
+                        </span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>To</label>
+                    <div class="input-group">
+                        <input class="form-control" placeholder="yyyy-mm-dd" ngbDatepicker #d2="ngbDatepicker"
+                            [minDate]="dtp2MinDate" formControlName="dtp2" (dateSelect)="onChangeDpt()">
+                        <span class="input-group-append">
+                            <button class="btn btn-secondary fa fa-calendar" (click)="d2.toggle()"
+                                type="button"></button>
+                        </span>
+                    </div>
+                </div>
+            </ng-template>
+            <div class="d-flex flex-row-reverse">
+                <button type="button" class="btn btn-primary" (click)="viewReport()"
+                    [disabled]="!formReport.valid">Proceed</button>
+            </div>
+        </form>
     </div>
 </ng-template>
 

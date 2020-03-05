@@ -17,7 +17,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace AspNetAngular.Controllers
 {
-    //[Authorize(Policy = "ApiUser")]
+    [Authorize (Policy = "ApiUser")]
     [Route("api/[controller]")]
     [ApiController]
 
@@ -111,12 +111,15 @@ namespace AspNetAngular.Controllers
                         PM = u.PM,
                         PMRemarks = u.PMRemarks,
                         PMPick = u.PMPick,
+                        PMGenerate = u.PMGenerate,
                         ITRM = u.ITRM,
                         ITRRemarks = u.ITRMRemarks,
                         ITRMPick = u.ITRMPick,
+                        ITRMGenerate = u.ITRMGenerate,
                         ARM = u.ARM,
                         ARMRemarks = u.ARMRemarks,
-                        ARMPick = u.ARMPick
+                        ARMPick = u.ARMPick,
+                        ARMGenerate = u.ARMGenerate
                     },
                     Locations = locations,
                     Role = roles.FirstOrDefault()
@@ -131,7 +134,7 @@ namespace AspNetAngular.Controllers
         }
 
         // POST api/accounts
-        [HttpPost]
+        [HttpPost("register")]
         public async Task<ActionResult<ResultReponser>> Register([FromBody] RegistrationViewModel model)
         {
             if (!ModelState.IsValid)
@@ -231,9 +234,15 @@ namespace AspNetAngular.Controllers
                 PM = {4},
                 PMRemarks = {5},
                 PMPick = {6},
-                ITRM = {7},
-                ITRRemarks = {8},
-                ITRMPick = {9}
+                PMGenerate = {7},
+                ITRM = {8},
+                ITRMRemarks = {9},
+                ITRMPick = {10},
+                ITRMGenerate = {11},
+                ARM = {12},
+                ARMRemarks = {13},
+                ARMPick = {14},
+                ARMGenerate = {15}
                 WHERE Id = {0}";
             var updateUser = await _context.Database.ExecuteSqlCommandAsync(
                 rawUpdateUser,
@@ -244,9 +253,15 @@ namespace AspNetAngular.Controllers
                 model.PM,
                 model.PMRemarks,
                 model.PMPick,
+                model.PMGenerate,
                 model.ITRM,
                 model.ITRMRemarks,
-                model.ITRMPick);
+                model.ITRMPick,
+                model.ITRMGenerate,
+                model.ARM,
+                model.ARMRemarks,
+                model.ARMPick,
+                model.ARMGenerate);
             var rawUpdateRole = @"
                 UPDATE AspNetUserRoles
                 SET RoleId = (SELECT Id FROM AspNetRoles Where Name = {0})
@@ -294,7 +309,7 @@ namespace AspNetAngular.Controllers
                 return new ResultReponser
                 {
                     Result = "Success",
-                    Message = "Successfully!",
+                    Message = "Password successfully changed",
                     ResponseData = ""
                 };
             }
